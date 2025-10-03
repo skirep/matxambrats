@@ -6,6 +6,8 @@
     <title>Dejoco Blocks</title>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div id="menu">
@@ -14,12 +16,20 @@
             <button id="lang-ca" class="lang-btn active">Català</button>
             <button id="lang-en" class="lang-btn">English</button>
         </div>
+        <div class="player-name-wrapper">
+            <label for="player-name" data-ca="Nom" data-en="Name">Nom</label>
+            <input id="player-name" type="text" maxlength="12" placeholder="Player" />
+        </div>
         <button id="new-game" data-ca="Nova Partida" data-en="New Game">Nova Partida</button>
         <button id="highscores" data-ca="Puntuacions" data-en="Highscores">Puntuacions</button>
         <button id="credits" data-ca="Crèdits" data-en="Credits">Crèdits</button>
+        <button id="clear-local-scores" data-ca="Esborrar Puntuacions Locals" data-en="Clear Local Scores">Esborrar Puntuacions Locals</button>
         <div class="music-control">
             <input type="checkbox" id="music-enabled">
             <label for="music-enabled" data-ca="Música" data-en="Music">Música</label>
+            <button id="music-mute" data-ca="Silenciar" data-en="Mute">Silenciar</button>
+            <label for="music-volume" data-ca="Volum" data-en="Volume">Volum</label>
+            <input type="range" id="music-volume" min="0" max="1" step="0.05" value="0.5" />
         </div>
     </div>
     <div id="game-container" style="display: none;">
@@ -33,6 +43,10 @@
                 <div>
                     <h3 data-ca="Temps" data-en="Time">Temps</h3>
                     <p id="timer">00:00</p>
+                </div>
+                <div>
+                    <h3 data-ca="Nivell" data-en="Level">Nivell</h3>
+                    <p id="level">1</p>
                 </div>
             </div>
             <h3 data-ca="Següent" data-en="Next">Següent</h3>

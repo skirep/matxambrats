@@ -42,6 +42,12 @@ canvas.height = boardHeight * blockSize;
 
 const board = Array.from({ length: boardHeight }, () => Array(boardWidth).fill(0));
 const scoreElement = document.getElementById('score');
+const levelElement = document.getElementById('level');
+const clearLocalBtn = document.getElementById('clear-local-scores');
+const musicMuteBtn = document.getElementById('music-mute');
+const musicVolumeSlider = document.getElementById('music-volume');
+let isMuted = false;
+let baseDropInterval = 400;
 
 nextPieceCanvas.width = 4 * blockSize;
 nextPieceCanvas.height = 4 * blockSize;
@@ -99,7 +105,14 @@ const translations = {
     credits: {
         ca: 'Dejoco Blocks\nDesenvolupat per un assistent d\'IA',
         en: 'Dejoco Blocks\nDeveloped by an AI assistant'
-    }
+    },
+    clearLocal: { ca: 'Esborrat puntuacions locals', en: 'Local scores cleared' },
+    confirmExit: { ca: 'Vols sortir de la partida en curs?', en: 'Leave the current game?' },
+    nameLabel: { ca: 'Nom', en: 'Name' },
+    mute: { ca: 'Silenciar', en: 'Mute' },
+    unmute: { ca: 'Activar', en: 'Unmute' },
+    volume: { ca: 'Volum', en: 'Volume' },
+    level: { ca: 'Nivell', en: 'Level' }
 };
 
 // Funció per actualitzar l'idioma
@@ -121,6 +134,11 @@ function updateLanguage(lang) {
         btn.classList.remove('active');
     });
     document.getElementById('lang-' + lang).classList.add('active');
+
+    // Actualitzar text botó mute segons estat
+    if (musicMuteBtn) {
+        musicMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
+    }
 }
 
 // Event listeners per als botons d'idioma
@@ -140,6 +158,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storedMusic !== null && musicCheckbox) {
         musicCheckbox.checked = storedMusic === 'true';
     }
+
+    // Restaurar volum i mute
+    const storedVol = localStorage.getItem('dejocoBlocksVolume');
+    if (storedVol && musicVolumeSlider) {
+        musicVolumeSlider.value = storedVol;
+        if (bgMusic) bgMusic.volume = parseFloat(storedVol);
+    }
+    const storedMuted = localStorage.getItem('dejocoBlocksMuted');
+    if (storedMuted) {
+        isMuted = storedMuted === 'true';
+        if (bgMusic) bgMusic.muted = isMuted;
+    }
+    if (musicMuteBtn) musicMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
 
     // Iniciar música si cal (després del primer gesture es reproduirà correctament)
     if (musicCheckbox && musicCheckbox.checked) {
@@ -393,9 +424,10 @@ function checkRows() {
                 scoreElement.textContent = score;
 
                 linesCleared += clearedCount;
+                updateLevel();
                 if (Math.floor(linesCleared / 10) > Math.floor((linesCleared - clearedCount) / 10)) {
                     gameSpeed = Math.max(100, gameSpeed - 50);
-                    dropInterval = gameSpeed;
+                    dropInterval = gameSpeed; // mantenim compatibilitat amb antiga lògica
                 }
                 
                 isAnimating = false;
@@ -405,6 +437,13 @@ function checkRows() {
 
         flashRow();
     }
+}
+
+function updateLevel() {
+    const level = Math.floor(linesCleared / 10) + 1;
+    if (levelElement) levelElement.textContent = level;
+    // Ajustem velocitat: cada nivell resta 35ms fins mínim 80
+    dropInterval = Math.max(80, baseDropInterval - (level - 1) * 35);
 }
 
 function gameOver() {
@@ -430,8 +469,9 @@ function startGame() {
     score = 0;
     scoreElement.textContent = score;
     linesCleared = 0;
-    gameSpeed = 400;
-    dropInterval = gameSpeed;
+    updateLevel();
+    baseDropInterval = 400;
+    dropInterval = baseDropInterval;
     elapsedTime = 0;
     isAnimating = false;
     isGameActive = true;
@@ -443,34 +483,128 @@ function startGame() {
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(updateTimer, 1000);
     resizeGame();
+    // Restaurar volum/mute cada partida
+    if (bgMusic) {
+        bgMusic.volume = parseFloat(localStorage.getItem('dejocoBlocksVolume') || musicVolumeSlider?.value || '0.5');
+        bgMusic.muted = (localStorage.getItem('dejocoBlocksMuted') === 'true');
+    }
     requestAnimationFrame(draw);
 }
 
-function showHighscores() {
-    document.getElementById('menu').style.display = 'none';
-    document.getElementById('highscores-screen').style.display = 'flex';
-    const highscoresList = document.getElementById('highscores-list');
-    const highscores = JSON.parse(localStorage.getItem('tetrisHighscores')) || [];
-    
-    highscoresList.innerHTML = '';
-    if (highscores.length === 0) {
-        highscoresList.innerHTML = '<li>' + translations.noScores[currentLanguage] + '</li>';
+// --- Firebase Highscores (Public Leaderboard) ---
+let firebaseApp = null;
+let firestore = null;
+let firestoreEnabled = false; // Canvi a true automàtic després de config vàlida
+
+function initFirebase() {
+    if (firebaseApp) return;
+    // Introdueix aquí la teva configuració de Firebase (PLACEHOLDERS)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAKe5KSEh71w1ik2ynRYBEyd9jWOY-Dl5U",
+        authDomain: "dejoco-blocks.firebaseapp.com",
+        projectId: "dejoco-blocks",
+    };
+    // Validació mínima perquè l'usuari ompli
+    if (!firebaseConfig.apiKey.startsWith('REEMPLENA')) {
+        firebaseApp = firebase.initializeApp(firebaseConfig);
+        firestore = firebase.firestore();
+        firestoreEnabled = true;
     } else {
-        highscores
-            .sort((a, b) => b - a)
-            .slice(0, 10)
-            .forEach(scoreValue => {
-                const li = document.createElement('li');
-                li.textContent = scoreValue;
-                highscoresList.appendChild(li);
-            });
+        console.warn('Firebase no configurat. S\'utilitzarà només el mode local.');
     }
 }
 
+async function saveRemoteHighscore(name, scoreValue) {
+    try {
+        initFirebase();
+        if (!firestoreEnabled) return; // Sense config -> sortim
+        const safeName = (name || 'Player').substring(0, 12);
+        await firestore.collection('highscores').add({
+            name: safeName,
+            score: scoreValue,
+            ts: Date.now()
+        });
+    } catch (e) {
+        console.warn('No s\'ha pogut desar el highscore remot:', e);
+    }
+}
+
+async function fetchRemoteHighscores(limit = 10) {
+    try {
+        initFirebase();
+        if (!firestoreEnabled) return null;
+        const snap = await firestore.collection('highscores')
+            .orderBy('score', 'desc')
+            .limit(limit)
+            .get();
+        return snap.docs.map(d => d.data());
+    } catch (e) {
+        console.warn('Falla obtenint highscores remots:', e);
+        return null;
+    }
+}
+// --- Fi Firebase ---
+
+// Guardar nom jugador a localStorage
+const playerNameInput = document.getElementById('player-name');
+if (playerNameInput) {
+    const storedName = localStorage.getItem('dejocoBlocksPlayerName');
+    if (storedName) playerNameInput.value = storedName;
+    playerNameInput.addEventListener('input', () => {
+        localStorage.setItem('dejocoBlocksPlayerName', playerNameInput.value.trim());
+    });
+}
+
+function showHighscores() {
+    if (isGameActive && !confirm(translations.confirmExit[currentLanguage])) return;
+    isGameActive = false; // aturem loop suau
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('highscores-screen').style.display = 'flex';
+    const highscoresList = document.getElementById('highscores-list');
+    highscoresList.innerHTML = '<li>Loading...</li>';
+
+    (async () => {
+        let remote = await fetchRemoteHighscores(10);
+        if (remote && remote.length > 0) {
+            highscoresList.innerHTML = '';
+            remote.forEach(entry => {
+                const li = document.createElement('li');
+                const dateStr = entry.ts ? new Date(entry.ts).toLocaleDateString(currentLanguage==='ca'?'ca-ES':'en-US',{month:'short',day:'numeric'}) : '';
+                li.textContent = `${entry.name}: ${entry.score}${dateStr? ' ('+dateStr+')':''}`;
+                highscoresList.appendChild(li);
+            });
+        } else {
+            const highscores = JSON.parse(localStorage.getItem('tetrisHighscores')) || [];
+            highscoresList.innerHTML = '';
+            if (highscores.length === 0) {
+                highscoresList.innerHTML = '<li>' + translations.noScores[currentLanguage] + '</li>';
+            } else {
+                highscores
+                    .sort((a, b) => b - a)
+                    .slice(0, 10)
+                    .forEach(scoreValue => {
+                        const li = document.createElement('li');
+                        li.textContent = scoreValue;
+                        highscoresList.appendChild(li);
+                    });
+            }
+        }
+    })();
+}
+
 function saveHighscore() {
+    if (score < 10) return; // Ignorem puntuacions massa baixes
     const highscores = JSON.parse(localStorage.getItem('tetrisHighscores')) || [];
     highscores.push(score);
     localStorage.setItem('tetrisHighscores', JSON.stringify(highscores));
+    // Enviar també a Firestore
+    const playerName = sanitizePlayerName((playerNameInput && playerNameInput.value.trim()) || 'Player');
+    saveRemoteHighscore(playerName, score);
+}
+
+function sanitizePlayerName(name) {
+    const cleaned = name.replace(/[^A-Za-zÀ-ÿ0-9_]/g, '').substring(0,12);
+    return cleaned || 'Player';
 }
 
 function showCredits() {
@@ -497,6 +631,43 @@ function toggleMusic(auto = false) {
 
 if (musicCheckbox) {
     musicCheckbox.addEventListener('change', () => toggleMusic());
+}
+
+if (musicMuteBtn) {
+    musicMuteBtn.addEventListener('click', () => {
+        isMuted = !isMuted;
+        if (bgMusic) bgMusic.muted = isMuted;
+        localStorage.setItem('dejocoBlocksMuted', isMuted ? 'true':'false');
+        musicMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
+    });
+}
+if (musicVolumeSlider) {
+    musicVolumeSlider.addEventListener('input', () => {
+        const v = parseFloat(musicVolumeSlider.value);
+        localStorage.setItem('dejocoBlocksVolume', v.toString());
+        if (bgMusic && !isMuted) bgMusic.volume = v;
+    });
+}
+
+// Clear local scores
+if (clearLocalBtn) {
+    clearLocalBtn.addEventListener('click', () => {
+        if (confirm(currentLanguage==='ca'? 'Segur que vols esborrar les puntuacions locals?':'Are you sure you want to clear local scores?')) {
+            localStorage.removeItem('tetrisHighscores');
+            alert(translations.clearLocal[currentLanguage]);
+        }
+    });
+}
+
+// Prevent accidental navigation from game (credits button)
+const creditsBtn = document.getElementById('credits');
+if (creditsBtn) {
+    const originalCreditsHandler = showCredits;
+    creditsBtn.removeEventListener('click', showCredits);
+    creditsBtn.addEventListener('click', () => {
+        if (isGameActive && !confirm(translations.confirmExit[currentLanguage])) return;
+        originalCreditsHandler();
+    });
 }
 
 // Integrate with language change (existing updateLanguage)
