@@ -1,10 +1,10 @@
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
-    padding: 20px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     min-height: 100vh;
     background-color: #1a1a1a;
@@ -17,6 +17,8 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 15px;
+    width: 100%;
+    max-width: 400px;
 }
 
 #menu button, #highscores-screen button {
@@ -26,7 +28,8 @@ body {
     border: 1px solid #555;
     color: #fff;
     cursor: pointer;
-    width: 200px;
+    width: 100%;
+    max-width: 200px;
     text-align: center;
 }
 
@@ -34,19 +37,45 @@ body {
     background-color: #444;
 }
 
+.music-control {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+}
+
+.music-control input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
 #game-container {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 20px;
-    align-items: flex-start;
-    position: relative;
+    width: 100%;
+    max-width: 800px;
+}
+
+@media (min-width: 768px) {
+    #game-container {
+        flex-direction: row;
+        align-items: flex-start;
+    }
 }
 
 #game-canvas {
     border: 2px solid #fff;
+    max-width: 100%;
+    height: auto;
 }
 
 #game-info {
-    width: 150px;
+    width: 100%;
+    max-width: 150px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -54,12 +83,13 @@ body {
 }
 
 #game-info h3 {
-    margin-top: 0;
+    margin: 0;
 }
 
 #score {
     font-size: 2em;
     color: #FFE138;
+    margin: 0;
 }
 
 #next-piece-canvas {
@@ -74,7 +104,8 @@ body {
 #highscores-list {
     list-style: none;
     padding: 0;
-    width: 200px;
+    width: 100%;
+    max-width: 200px;
     text-align: center;
 }
 
@@ -90,10 +121,11 @@ body {
 
 #mobile-controls {
     display: grid;
-    grid-template-columns: repeat(3, 50px);
-    grid-template-rows: repeat(2, 50px);
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     gap: 5px;
-    width: fit-content;
+    width: 100%;
+    max-width: 200px;
     margin: 10px auto 0;
     background-color: rgba(0, 0, 0, 0.5);
     padding: 10px;
@@ -102,8 +134,8 @@ body {
 }
 
 #mobile-controls button {
-    width: 50px;
-    height: 50px;
+    width: 100%;
+    aspect-ratio: 1;
     padding: 0;
     font-size: 24px;
     background-color: #333;

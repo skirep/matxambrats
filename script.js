@@ -72,13 +72,32 @@ let gameInterval;
 let currentPiece;
 let currentX;
 let currentY;
+let pixelY = 0;
+let lastTime = 0;
+let dropCounter = 0;
+let dropInterval = 400;
 let nextPiece;
 let linesCleared = 0;
-let gameSpeed = 500;
+let gameSpeed = 400;
 let timerInterval;
 let elapsedTime = 0;
-let particles = [];
 let isAnimating = false;
+let animationFrame = 0;
+let isGameActive = false;
+
+// Funció per ajustar la mida del canvas
+function resizeGame() {
+    const container = document.getElementById('game-container');
+    const containerWidth = container.clientWidth;
+    const maxWidth = Math.min(containerWidth - 20, 300); // 20px de marge
+    const scaleFactor = maxWidth / (boardWidth * blockSize);
+    
+    canvas.style.width = `${boardWidth * blockSize * scaleFactor}px`;
+    canvas.style.height = `${boardHeight * blockSize * scaleFactor}px`;
+}
+
+// Event listener per redimensionar
+window.addEventListener('resize', resizeGame);
 
 function generatePiece() {
     const pieces = 'TJLOSZI';
@@ -92,31 +111,37 @@ function createPiece() {
     drawNextPiece();
     currentX = Math.floor(boardWidth / 2) - Math.floor(currentPiece[0].length / 2);
     currentY = 0;
+    pixelY = 0;
 
     if (checkCollision()) {
         gameOver();
     }
 }
 
-function drawBlock(x, y, color, ctx) {
+function drawBlock(x, y, color, ctx, offsetX = 0, offsetY = 0) {
+    const pixelX = offsetX + (x * blockSize);
+    const pixelY = offsetY + (y * blockSize);
+    
     ctx.fillStyle = color;
-    ctx.fillRect(x * blockSize, y * blockSize, blockSize, blockSize);
+    ctx.fillRect(pixelX, pixelY, blockSize, blockSize);
 
     // Simple 3D/pixelated effect
     ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.fillRect(x * blockSize, y * blockSize, blockSize, 2); // Top highlight
-    ctx.fillRect(x * blockSize, y * blockSize, 2, blockSize); // Left highlight
+    ctx.fillRect(pixelX, pixelY, blockSize, 2);
+    ctx.fillRect(pixelX, pixelY, 2, blockSize);
 
     ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.fillRect(x * blockSize, y * blockSize + blockSize - 2, blockSize, 2); // Bottom shadow
-    ctx.fillRect(x * blockSize + blockSize - 2, y * blockSize, 2, blockSize); // Right shadow
+    ctx.fillRect(pixelX, pixelY + blockSize - 2, blockSize, 2);
+    ctx.fillRect(pixelX + blockSize - 2, pixelY, 2, blockSize);
 }
 
 function drawMatrix(matrix, offsetX, offsetY, ctx) {
     matrix.forEach((row, y) => {
         row.forEach((value, x) => {
             if (value !== 0) {
-                drawBlock(offsetX + x, offsetY + y, colors[value], ctx);
+                const drawX = offsetX * blockSize;
+                const drawY = offsetY * blockSize;
+                drawBlock(x, y, colors[value], ctx, drawX, drawY);
             }
         });
     });
@@ -133,21 +158,37 @@ function drawNextPiece() {
     drawMatrix(matrix, offsetX, offsetY, nextPieceContext);
 }
 
-function draw() {
+function draw(timestamp = 0) {
+    const deltaTime = timestamp - lastTime;
+    lastTime = timestamp;
+
+    dropCounter += deltaTime;
+    if (dropCounter > dropInterval) {
+        movePiece('down');
+        dropCounter = 0;
+    }
+
     // Clear board
     context.fillStyle = '#000';
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw landed pieces
     drawMatrix(board, 0, 0, context);
-    // Draw current piece
-    drawMatrix(currentPiece, currentX, currentY, context);
+    
+    // Draw current piece with pixel-perfect position
+    if (!isAnimating && currentPiece) {
+        const drawY = currentY + (pixelY / blockSize);
+        drawMatrix(currentPiece, currentX, drawY, context);
+    }
 
-    drawParticles();
+    if (isGameActive) {
+        requestAnimationFrame(draw);
+    }
 }
 
 function movePiece(dir) {
     if (isAnimating) return;
+    
     if (dir === 'left') {
         currentX--;
         if (checkCollision()) {
@@ -159,13 +200,32 @@ function movePiece(dir) {
             currentX--;
         }
     } else if (dir === 'down') {
-        currentY++;
+        const previousPixelY = pixelY;
+        pixelY += 10;
+        
         if (checkCollision()) {
-            currentY--;
-            mergePiece();
-            checkRows();
-            if (!isAnimating) {
-                createPiece();
+            // Retrocedim al punt exacte de col·lisió
+            pixelY = previousPixelY;
+            if (pixelY === previousPixelY) {
+                // Si ja estàvem en col·lisió, fusionem la peça
+                mergePiece();
+                checkRows();
+                if (!isAnimating) {
+                    createPiece();
+                }
+            }
+        } else if (pixelY >= blockSize) {
+            // Actualitzem la posició de la graella quan creuem un bloc complet
+            currentY++;
+            pixelY = 0;
+            
+            if (checkCollision()) {
+                currentY--;
+                mergePiece();
+                checkRows();
+                if (!isAnimating) {
+                    createPiece();
+                }
             }
         }
     }
@@ -196,11 +256,23 @@ function rotatePiece() {
 }
 
 function checkCollision() {
+    const yWithPixels = currentY + Math.floor((pixelY + blockSize - 1) / blockSize);
+    
     for (let y = 0; y < currentPiece.length; y++) {
         for (let x = 0; x < currentPiece[y].length; x++) {
-            if (currentPiece[y][x] !== 0 &&
-                (board[y + currentY] && board[y + currentY][x + currentX]) !== 0) {
-                return true;
+            if (currentPiece[y][x] !== 0) {
+                // Comprova col·lisió amb el fons del tauler
+                if (y + yWithPixels >= boardHeight) {
+                    return true;
+                }
+                // Comprova col·lisió amb les vores
+                if (x + currentX < 0 || x + currentX >= boardWidth) {
+                    return true;
+                }
+                // Comprova col·lisió amb altres peces
+                if (board[y + yWithPixels] && board[yWithPixels][x + currentX] !== 0) {
+                    return true;
+                }
             }
         }
     }
@@ -208,44 +280,17 @@ function checkCollision() {
 }
 
 function mergePiece() {
+    const yWithPixels = currentY + Math.floor(pixelY / blockSize);
     currentPiece.forEach((row, y) => {
         row.forEach((value, x) => {
             if (value !== 0) {
-                board[y + currentY][x + currentX] = value;
+                if (y + yWithPixels >= 0 && y + yWithPixels < boardHeight &&
+                    x + currentX >= 0 && x + currentX < boardWidth) {
+                    board[y + yWithPixels][x + currentX] = value;
+                }
             }
         });
     });
-}
-
-function createParticles(x, y, color) {
-    for (let i = 0; i < 10; i++) {
-        particles.push({
-            x: x * blockSize + blockSize / 2,
-            y: y * blockSize + blockSize / 2,
-            vx: (Math.random() - 0.5) * 3,
-            vy: (Math.random() - 0.5) * 3,
-            color: color,
-            alpha: 1
-        });
-    }
-}
-
-function drawParticles() {
-    for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -= 0.05;
-
-        if (p.alpha <= 0) {
-            particles.splice(i, 1);
-        } else {
-            context.globalAlpha = p.alpha;
-            context.fillStyle = p.color;
-            context.fillRect(p.x, p.y, 3, 3);
-            context.globalAlpha = 1;
-        }
-    }
 }
 
 function checkRows() {
@@ -261,53 +306,49 @@ function checkRows() {
 
     if (rowsToClear.length > 0) {
         isAnimating = true;
-        clearInterval(gameInterval);
 
-        rowsToClear.forEach(y => {
-            for (let x = 0; x < boardWidth; x++) {
-                if (board[y][x] !== 0) {
-                    createParticles(x, y, colors[board[y][x]]);
-                    board[y][x] = 0;
+        // Flash animation
+        const flashRow = () => {
+            rowsToClear.forEach(y => {
+                for (let x = 0; x < boardWidth; x++) {
+                    context.fillStyle = '#FFF';
+                    context.fillRect(x * blockSize, y * blockSize, blockSize, blockSize);
                 }
-            }
-        });
-
-        setTimeout(() => {
-            const clearedCount = rowsToClear.length;
-            rowsToClear.sort((a, b) => a - b).forEach(y_to_remove => {
-                const row = board.splice(y_to_remove, 1)[0].fill(0);
-                board.unshift(row);
             });
 
-            score += clearedCount * 10;
-            scoreElement.textContent = score;
+            requestAnimationFrame(() => {
+                // Clear the rows and update the game state
+                rowsToClear.sort((a, b) => a - b).forEach(y_to_remove => {
+                    const row = board.splice(y_to_remove, 1)[0].fill(0);
+                    board.unshift(row);
+                });
 
-            linesCleared += clearedCount;
-            if (Math.floor(linesCleared / 10) > Math.floor((linesCleared - clearedCount) / 10)) {
-                gameSpeed = Math.max(100, gameSpeed - 50);
-            }
-            
-            isAnimating = false;
-            createPiece();
-            gameInterval = setInterval(gameLoop, gameSpeed);
-        }, 100); // Wait for particle animation
+                const clearedCount = rowsToClear.length;
+                score += clearedCount * 10;
+                scoreElement.textContent = score;
+
+                linesCleared += clearedCount;
+                if (Math.floor(linesCleared / 10) > Math.floor((linesCleared - clearedCount) / 10)) {
+                    gameSpeed = Math.max(100, gameSpeed - 50);
+                    dropInterval = gameSpeed;
+                }
+                
+                isAnimating = false;
+                createPiece();
+            });
+        };
+
+        flashRow();
     }
 }
 
 function gameOver() {
-    clearInterval(gameInterval);
+    isGameActive = false;
     clearInterval(timerInterval);
     saveHighscore();
     alert(`Game Over! Your score: ${score}`);
     document.getElementById('game-container').style.display = 'none';
     document.getElementById('menu').style.display = 'flex';
-}
-
-function gameLoop() {
-    if (!isAnimating) {
-        movePiece('down');
-    }
-    draw();
 }
 
 function updateTimer() {
@@ -324,18 +365,20 @@ function startGame() {
     score = 0;
     scoreElement.textContent = score;
     linesCleared = 0;
-    gameSpeed = 500;
+    gameSpeed = 400;
+    dropInterval = gameSpeed;
     elapsedTime = 0;
-    particles = [];
     isAnimating = false;
+    isGameActive = true;
+    lastTime = 0;
+    dropCounter = 0;
     document.getElementById('timer').textContent = '00:00';
     nextPiece = generatePiece();
     createPiece();
-    draw();
-    if (gameInterval) clearInterval(gameInterval);
-    gameInterval = setInterval(gameLoop, gameSpeed);
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(updateTimer, 1000);
+    resizeGame();
+    requestAnimationFrame(draw);
 }
 
 function showHighscores() {
