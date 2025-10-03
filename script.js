@@ -152,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storedLang === 'ca' || storedLang === 'en') {
         currentLanguage = storedLang;
     }
-    updateLanguage(currentLanguage);
 
     // Restaurar estat música
     const storedMusic = localStorage.getItem('dejocoBlocksMusic');
@@ -178,8 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleMusic();
     }
 
-    // Inicialitzar l'idioma per defecte
-    updateLanguage('ca');
+    // Inicialitzar l'idioma (només una vegada)
+    updateLanguage(currentLanguage);
 });
 
 // Funció per ajustar la mida del canvas
@@ -233,11 +232,11 @@ function drawBlock(x, y, color, ctx, offsetX = 0, offsetY = 0) {
 }
 
 function drawMatrix(matrix, offsetX, offsetY, ctx) {
+    const drawX = offsetX * blockSize;
+    const drawY = offsetY * blockSize;
     matrix.forEach((row, y) => {
         row.forEach((value, x) => {
             if (value !== 0) {
-                const drawX = offsetX * blockSize;
-                const drawY = offsetY * blockSize;
                 drawBlock(x, y, colors[value], ctx, drawX, drawY);
             }
         });
@@ -326,12 +325,13 @@ function movePiece(dir, speedMultiplier = 1) {
 
 function rotatePiece() {
     if (isAnimating) return;
+    const originalPiece = currentPiece;
+    const originalX = currentX;
     const rotated = [];
     for (let i = 0; i < currentPiece[0].length; i++) {
         const newRow = currentPiece.map(row => row[i]).reverse();
         rotated.push(newRow);
     }
-    const originalX = currentX;
     let offset = 1;
     currentPiece = rotated;
     while (checkCollision()) {
@@ -339,9 +339,7 @@ function rotatePiece() {
         offset = -(offset + (offset > 0 ? 1 : -1));
         if (offset > currentPiece[0].length) {
             // Revert rotation
-            rotatePiece();
-            rotatePiece();
-            rotatePiece();
+            currentPiece = originalPiece;
             currentX = originalX;
             return;
         }
@@ -352,18 +350,24 @@ function checkCollision() {
     const yWithPixels = currentY + Math.floor((pixelY + blockSize - 1) / blockSize);
     
     for (let y = 0; y < currentPiece.length; y++) {
+        const boardY = y + yWithPixels;
+        // Comprova col·lisió amb el fons del tauler
+        if (boardY >= boardHeight) {
+            for (let x = 0; x < currentPiece[y].length; x++) {
+                if (currentPiece[y][x] !== 0) return true;
+            }
+            continue;
+        }
+        
         for (let x = 0; x < currentPiece[y].length; x++) {
             if (currentPiece[y][x] !== 0) {
-                // Comprova col·lisió amb el fons del tauler
-                if (y + yWithPixels >= boardHeight) {
-                    return true;
-                }
+                const boardX = x + currentX;
                 // Comprova col·lisió amb les vores
-                if (x + currentX < 0 || x + currentX >= boardWidth) {
+                if (boardX < 0 || boardX >= boardWidth) {
                     return true;
                 }
                 // Comprova col·lisió amb altres peces
-                if (board[y + yWithPixels] && board[y + yWithPixels][x + currentX] !== 0) {
+                if (board[boardY][boardX] !== 0) {
                     return true;
                 }
             }
@@ -387,9 +391,9 @@ function mergePiece() {
 }
 
 function checkRows() {
-    let rowsToClear = [];
+    const rowsToClear = [];
     outer: for (let y = board.length - 1; y > 0; --y) {
-        for (let x = 0; x < board[y].length; ++x) {
+        for (let x = 0; x < boardWidth; ++x) {
             if (board[y][x] === 0) {
                 continue outer;
             }
@@ -399,6 +403,8 @@ function checkRows() {
 
     if (rowsToClear.length > 0) {
         isAnimating = true;
+        const clearedCount = rowsToClear.length;
+        const previousLinesCleared = linesCleared;
 
         // Flash animation
         const flashRow = () => {
@@ -416,15 +422,14 @@ function checkRows() {
                     board.unshift(row);
                 });
 
-                const clearedCount = rowsToClear.length;
                 score += clearedCount * 10;
                 scoreElement.textContent = score;
 
                 linesCleared += clearedCount;
                 updateLevel();
-                if (Math.floor(linesCleared / 10) > Math.floor((linesCleared - clearedCount) / 10)) {
+                if (Math.floor(linesCleared / 10) > Math.floor(previousLinesCleared / 10)) {
                     gameSpeed = Math.max(100, gameSpeed - 50);
-                    dropInterval = gameSpeed; // mantenim compatibilitat amb antiga lògica
+                    dropInterval = gameSpeed;
                 }
                 
                 isAnimating = false;
@@ -482,9 +487,12 @@ function startGame() {
     resizeGame();
     // Restaurar volum/mute cada partida
     if (bgMusic) {
-        bgMusic.volume = parseFloat(localStorage.getItem('dejocoBlocksVolume') || musicVolumeSlider?.value || '0.5');
-        bgMusic.muted = (localStorage.getItem('dejocoBlocksMuted') === 'true');
+        const savedVolume = localStorage.getItem('dejocoBlocksVolume');
+        const savedMuted = localStorage.getItem('dejocoBlocksMuted');
+        bgMusic.volume = parseFloat(savedVolume || musicVolumeSlider?.value || '0.5');
+        bgMusic.muted = (savedMuted === 'true');
     }
+    toggleMusic(true);
     requestAnimationFrame(draw);
 }
 
@@ -619,6 +627,7 @@ function sanitizePlayerName(name) {
 }
 
 function showCredits() {
+    if (isGameActive && !confirm(translations.confirmExit[currentLanguage])) return;
     alert(translations.credits[currentLanguage]);
 }
 
@@ -670,37 +679,7 @@ if (clearLocalBtn) {
     });
 }
 
-// Prevent accidental navigation from game (credits button)
-const creditsBtn = document.getElementById('credits');
-if (creditsBtn) {
-    const originalCreditsHandler = showCredits;
-    creditsBtn.removeEventListener('click', showCredits);
-    creditsBtn.addEventListener('click', () => {
-        if (isGameActive && !confirm(translations.confirmExit[currentLanguage])) return;
-        originalCreditsHandler();
-    });
-}
 
-// Integrate with language change (existing updateLanguage)
-const oldUpdateLanguage = updateLanguage;
-updateLanguage = function (lang) {
-    oldUpdateLanguage(lang);
-};
-
-// Ensure music state when starting the game
-const oldStartGame = startGame;
-startGame = function () {
-    oldStartGame();
-    toggleMusic(true);
-};
-
-// Stop music on Game Over
-const oldGameOver = gameOver;
-gameOver = function () {
-    oldGameOver();
-    // Keep music if checkbox remains active; to stop it, uncomment:
-    // bgMusic.pause();
-};
 
 const refreshBtn = document.getElementById('refresh-highscores');
 if (refreshBtn) {
