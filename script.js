@@ -9,7 +9,7 @@ document.getElementById('back-to-menu').addEventListener('click', () => {
 document.getElementById('left').addEventListener('click', () => movePiece('left'));
 document.getElementById('rotate').addEventListener('click', () => rotatePiece());
 document.getElementById('right').addEventListener('click', () => movePiece('right'));
-document.getElementById('down').addEventListener('click', () => movePiece('down'));
+document.getElementById('down').addEventListener('click', () => movePiece('down', 3)); // 3 * 10px = 30px per clic
 
 document.addEventListener('keydown', (event) => {
     switch (event.key) {
@@ -112,7 +112,8 @@ const translations = {
     mute: { ca: 'Silenciar', en: 'Mute' },
     unmute: { ca: 'Activar', en: 'Unmute' },
     volume: { ca: 'Volum', en: 'Volume' },
-    level: { ca: 'Nivell', en: 'Level' }
+    level: { ca: 'Nivell', en: 'Level' },
+    pointsSuffix: { ca: 'pts', en: 'pts' }
 };
 
 // Funció per actualitzar l'idioma
@@ -282,7 +283,7 @@ function draw(timestamp = 0) {
     }
 }
 
-function movePiece(dir) {
+function movePiece(dir, speedMultiplier = 1) {
     if (isAnimating) return;
     
     if (dir === 'left') {
@@ -297,13 +298,11 @@ function movePiece(dir) {
         }
     } else if (dir === 'down') {
         const previousPixelY = pixelY;
-        pixelY += 10;
+        pixelY += 10 * speedMultiplier; // cada unitat = 10px; botó web usa 3 => 30px
         
         if (checkCollision()) {
-            // Retrocedim al punt exacte de col·lisió
             pixelY = previousPixelY;
             if (pixelY === previousPixelY) {
-                // Si ja estàvem en col·lisió, fusionem la peça
                 mergePiece();
                 checkRows();
                 if (!isAnimating) {
@@ -311,10 +310,8 @@ function movePiece(dir) {
                 }
             }
         } else if (pixelY >= blockSize) {
-            // Actualitzem la posició de la graella quan creuem un bloc complet
             currentY++;
             pixelY = 0;
-            
             if (checkCollision()) {
                 currentY--;
                 mergePiece();
@@ -555,41 +552,55 @@ if (playerNameInput) {
     });
 }
 
+function renderHighscoreList(entries, isRemote) {
+    const list = document.getElementById('highscores-list');
+    list.innerHTML = '';
+    if (!entries || entries.length === 0) {
+        list.innerHTML = '<li>' + translations.noScores[currentLanguage] + '</li>';
+        return;
+    }
+    entries.forEach((entry, i) => {
+        const li = document.createElement('li');
+        if (i === 0) li.classList.add('top-1');
+        else if (i === 1) li.classList.add('top-2');
+        else if (i === 2) li.classList.add('top-3');
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+        const pos = document.createElement('span'); pos.className='pos'; pos.textContent = (i+1)+'.';
+        const name = document.createElement('span'); name.className='name'; name.textContent = medal ? medal+' '+entry.name : entry.name;
+        const scoreSpan = document.createElement('span'); scoreSpan.className='score'; scoreSpan.textContent = entry.score + ' ' + translations.pointsSuffix[currentLanguage];
+        const dateSpan = document.createElement('span'); dateSpan.className='date';
+        if (entry.ts) {
+            const d = new Date(entry.ts);
+            dateSpan.textContent = d.toLocaleDateString(currentLanguage==='ca'?'ca-ES':'en-US',{year:'2-digit',month:'2-digit',day:'2-digit'}) + ' ' + d.toLocaleTimeString(currentLanguage==='ca'?'ca-ES':'en-US',{hour:'2-digit',minute:'2-digit'});
+        }
+        li.appendChild(pos);
+        li.appendChild(name);
+        li.appendChild(scoreSpan);
+        li.appendChild(dateSpan);
+        list.appendChild(li);
+    });
+}
+
+async function loadHighscores(limit=50) {
+    const highscoresList = document.getElementById('highscores-list');
+    highscoresList.innerHTML = '<li>Loading...</li>';
+    let remote = await fetchRemoteHighscores(limit);
+    if (remote && remote.length > 0) {
+        renderHighscoreList(remote.map(r=>({name:r.name, score:r.score, ts:r.ts})), true);
+    } else {
+        const local = (JSON.parse(localStorage.getItem('tetrisHighscores')) || [])
+            .sort((a,b)=>b-a).slice(0, limit)
+            .map(s=>({name:'—', score:s, ts:null}));
+        renderHighscoreList(local, false);
+    }
+}
+
 function showHighscores() {
     if (isGameActive && !confirm(translations.confirmExit[currentLanguage])) return;
     isGameActive = false; // aturem loop suau
     document.getElementById('menu').style.display = 'none';
     document.getElementById('highscores-screen').style.display = 'flex';
-    const highscoresList = document.getElementById('highscores-list');
-    highscoresList.innerHTML = '<li>Loading...</li>';
-
-    (async () => {
-        let remote = await fetchRemoteHighscores(10);
-        if (remote && remote.length > 0) {
-            highscoresList.innerHTML = '';
-            remote.forEach(entry => {
-                const li = document.createElement('li');
-                const dateStr = entry.ts ? new Date(entry.ts).toLocaleDateString(currentLanguage==='ca'?'ca-ES':'en-US',{month:'short',day:'numeric'}) : '';
-                li.textContent = `${entry.name}: ${entry.score}${dateStr? ' ('+dateStr+')':''}`;
-                highscoresList.appendChild(li);
-            });
-        } else {
-            const highscores = JSON.parse(localStorage.getItem('tetrisHighscores')) || [];
-            highscoresList.innerHTML = '';
-            if (highscores.length === 0) {
-                highscoresList.innerHTML = '<li>' + translations.noScores[currentLanguage] + '</li>';
-            } else {
-                highscores
-                    .sort((a, b) => b - a)
-                    .slice(0, 10)
-                    .forEach(scoreValue => {
-                        const li = document.createElement('li');
-                        li.textContent = scoreValue;
-                        highscoresList.appendChild(li);
-                    });
-            }
-        }
-    })();
+    loadHighscores(50);
 }
 
 function saveHighscore() {
@@ -690,3 +701,10 @@ gameOver = function () {
     // Keep music if checkbox remains active; to stop it, uncomment:
     // bgMusic.pause();
 };
+
+const refreshBtn = document.getElementById('refresh-highscores');
+if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+        loadHighscores(50);
+    });
+}

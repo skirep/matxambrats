@@ -202,14 +202,41 @@ body {
     list-style: none;
     padding: 0;
     width: 100%;
-    max-width: 200px;
-    text-align: center;
+    max-width: 320px;
+    text-align: left;
+    margin: 10px auto;
+    font-family: monospace;
+    font-size: 14px;
 }
 
 #highscores-list li {
-    font-size: 1.2em;
-    padding: 5px 0;
-    border-bottom: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    border-bottom: 1px solid #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#highscores-list li:nth-child(odd) { background: rgba(255,255,255,0.04); }
+#highscores-list li:nth-child(even) { background: rgba(0,0,0,0.2); }
+#highscores-list li.top-1 { background: linear-gradient(90deg, #ffd70033, #00000000); }
+#highscores-list li.top-2 { background: linear-gradient(90deg, #c0c0c033, #00000000); }
+#highscores-list li.top-3 { background: linear-gradient(90deg, #cd7f3233, #00000000); }
+#highscores-list .pos { width: 38px; font-weight: bold; }
+#highscores-list .name { flex: 1; padding: 0 6px; }
+#highscores-list .score { width: 70px; text-align: right; }
+#highscores-list .date { width: 70px; text-align: right; opacity: 0.7; font-size: 11px; }
+
+.highscores-actions { display: flex; gap: 10px; margin-top: 10px; }
+.highscores-actions button { flex: 1; }
+
+@media (max-width: 480px) {
+  #highscores-list { font-size: 12px; }
+  #highscores-list .score { width: 60px; }
+  #highscores-list .date { display: none; }
 }
 
 #highscores-list li:last-child {
