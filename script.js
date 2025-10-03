@@ -105,6 +105,7 @@ const translations = {
 // Funció per actualitzar l'idioma
 function updateLanguage(lang) {
     currentLanguage = lang;
+    localStorage.setItem('dejocoBlocksLang', lang);
     
     // Seleccionem tots els elements que tenen atributs data-ca o data-en
     const elements = document.querySelectorAll('[data-' + lang + ']');
@@ -127,6 +128,24 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('lang-ca').addEventListener('click', () => updateLanguage('ca'));
     document.getElementById('lang-en').addEventListener('click', () => updateLanguage('en'));
     
+    // Restaurar idioma
+    const storedLang = localStorage.getItem('dejocoBlocksLang');
+    if (storedLang === 'ca' || storedLang === 'en') {
+        currentLanguage = storedLang;
+    }
+    updateLanguage(currentLanguage);
+
+    // Restaurar estat música
+    const storedMusic = localStorage.getItem('dejocoBlocksMusic');
+    if (storedMusic !== null && musicCheckbox) {
+        musicCheckbox.checked = storedMusic === 'true';
+    }
+
+    // Iniciar música si cal (després del primer gesture es reproduirà correctament)
+    if (musicCheckbox && musicCheckbox.checked) {
+        toggleMusic();
+    }
+
     // Inicialitzar l'idioma per defecte
     updateLanguage('ca');
 });
@@ -457,3 +476,46 @@ function saveHighscore() {
 function showCredits() {
     alert(translations.credits[currentLanguage]);
 }
+
+// Music control logic
+const musicCheckbox = document.getElementById('music-enabled');
+const bgMusic = document.getElementById('bg-music');
+
+function toggleMusic(auto = false) {
+    if (!bgMusic) return;
+    localStorage.setItem('dejocoBlocksMusic', musicCheckbox.checked ? 'true' : 'false');
+    if (musicCheckbox.checked) {
+        const playPromise = bgMusic.play();
+        if (playPromise) {
+            playPromise.catch(() => {});
+        }
+    } else {
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
+    }
+}
+
+if (musicCheckbox) {
+    musicCheckbox.addEventListener('change', () => toggleMusic());
+}
+
+// Integrate with language change (existing updateLanguage)
+const oldUpdateLanguage = updateLanguage;
+updateLanguage = function (lang) {
+    oldUpdateLanguage(lang);
+};
+
+// Ensure music state when starting the game
+const oldStartGame = startGame;
+startGame = function () {
+    oldStartGame();
+    toggleMusic(true);
+};
+
+// Stop music on Game Over
+const oldGameOver = gameOver;
+gameOver = function () {
+    oldGameOver();
+    // Keep music if checkbox remains active; to stop it, uncomment:
+    // bgMusic.pause();
+};

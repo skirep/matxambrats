@@ -17,6 +17,10 @@
         <button id="new-game" data-ca="Nova Partida" data-en="New Game">Nova Partida</button>
         <button id="highscores" data-ca="Puntuacions" data-en="Highscores">Puntuacions</button>
         <button id="credits" data-ca="Crèdits" data-en="Credits">Crèdits</button>
+        <div class="music-control">
+            <input type="checkbox" id="music-enabled" checked>
+            <label for="music-enabled" data-ca="Música" data-en="Music">Música</label>
+        </div>
     </div>
     <div id="game-container" style="display: none;">
         <canvas id="game-canvas"></canvas>
@@ -48,5 +52,6 @@
         </ul>
         <button id="back-to-menu" data-ca="Tornar al Menú" data-en="Back to Menu">Tornar al Menú</button>
     </div>
+    <audio id="bg-music" src="tetris.mp3" preload="auto" loop style="display:none"></audio>
 </body>
 </html>
