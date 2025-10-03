@@ -87,6 +87,84 @@ body {
 }
 
 @media (max-width: 767px) {
+    body {
+        padding: 5px;
+        overflow: hidden;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #game-container {
+        justify-content: flex-start;
+        padding: 10px;
+        height: 100vh;
+        max-height: 100vh;
+        overflow: hidden;
+        margin: 0;
+        display: grid;
+        grid-template-rows: auto auto;
+        gap: 10px;
+    }
+
+    #game-canvas {
+        width: 45vw !important; /* Fem el tauler encara més petit */
+        height: auto !important;
+        margin: 0 auto;
+    }
+
+    #game-info {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 5px;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.9);
+        border-radius: 10px;
+        width: 90vw;
+        margin: 0 auto;
+    }
+
+    .game-stats {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 5px;
+    }
+
+    #next-piece-canvas {
+        width: 40px;
+        height: 40px;
+        grid-column: 1 / 2;
+    }
+
+    #mobile-controls {
+        grid-column: 1 / -1;
+        width: 100%;
+        max-width: 160px;
+        margin: 0 auto;
+        gap: 3px;
+        padding: 5px;
+    }
+
+    #mobile-controls button {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        padding: 0;
+    }
+
+    h3 {
+        font-size: 0.9em;
+        margin: 0;
+    }
+
+    #score, #timer {
+        font-size: 1em;
+        margin: 0;
+    }
+
     #game-container {
         justify-content: flex-start;
         padding-bottom: 20px;

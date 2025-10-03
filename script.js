@@ -102,10 +102,17 @@ const translations = {
     }
 };
 
+// Funció per actualitzar l'idioma
 function updateLanguage(lang) {
     currentLanguage = lang;
-    document.querySelectorAll('[data-' + lang + ']').forEach(element => {
-        element.textContent = element.getAttribute('data-' + lang);
+    
+    // Seleccionem tots els elements que tenen atributs data-ca o data-en
+    const elements = document.querySelectorAll('[data-' + lang + ']');
+    elements.forEach(element => {
+        const newText = element.getAttribute('data-' + lang);
+        if (newText) {
+            element.textContent = newText;
+        }
     });
     
     // Actualitzar classe activa dels botons d'idioma
@@ -116,8 +123,13 @@ function updateLanguage(lang) {
 }
 
 // Event listeners per als botons d'idioma
-document.getElementById('lang-ca').addEventListener('click', () => updateLanguage('ca'));
-document.getElementById('lang-en').addEventListener('click', () => updateLanguage('en'));
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('lang-ca').addEventListener('click', () => updateLanguage('ca'));
+    document.getElementById('lang-en').addEventListener('click', () => updateLanguage('en'));
+    
+    // Inicialitzar l'idioma per defecte
+    updateLanguage('ca');
+});
 
 // Funció per ajustar la mida del canvas
 function resizeGame() {
