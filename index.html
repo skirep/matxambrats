@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dejoco Blocks</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div id="menu">
+        <h1>Dejoco Blocks</h1>
+        <button id="new-game">New Game</button>
+        <button id="highscores">Highscores</button>
+        <button id="credits">Credits</button>
+    </div>
+    <div id="game-container" style="display: none;">
+        <canvas id="game-canvas"></canvas>
+        <div id="game-info">
+            <h3>Score</h3>
+            <p id="score">0</p>
+            <h3>Time</h3>
+            <p id="timer">00:00</p>
+            <h3>Next</h3>
+            <canvas id="next-piece-canvas"></canvas>
+            <div id="mobile-controls">
+                <button id="left">&#x2B05;</button>
+                <button id="rotate">&#x21BB;</button>
+                <button id="right">&#x27A1;</button>
+                <button id="down">&#x2B07;</button>
+            </div>
+        </div>
+    </div>
+    <div id="highscores-screen" style="display: none;">
+        <h1>High Scores</h1>
+        <ul id="highscores-list">
+            <!-- Scores will be populated by script.js -->
+        </ul>
+        <button id="back-to-menu">Back to Menu</button>
+    </div>
+</body>
+</html>

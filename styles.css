@@ -1,0 +1,141 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #1a1a1a;
+    color: #fff;
+    box-sizing: border-box;
+}
+
+#menu, #highscores-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+#menu button, #highscores-screen button {
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #333;
+    border: 1px solid #555;
+    color: #fff;
+    cursor: pointer;
+    width: 200px;
+    text-align: center;
+}
+
+#menu button:hover, #highscores-screen button:hover {
+    background-color: #444;
+}
+
+#game-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    position: relative;
+}
+
+#game-canvas {
+    border: 2px solid #fff;
+}
+
+#game-info {
+    width: 150px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#game-info h3 {
+    margin-top: 0;
+}
+
+#score {
+    font-size: 2em;
+    color: #FFE138;
+}
+
+#next-piece-canvas {
+    width: 120px;
+    height: 120px;
+    background-color: #000;
+    border: 2px solid #fff;
+    margin: 0 auto;
+    image-rendering: pixelated;
+}
+
+#highscores-list {
+    list-style: none;
+    padding: 0;
+    width: 200px;
+    text-align: center;
+}
+
+#highscores-list li {
+    font-size: 1.2em;
+    padding: 5px 0;
+    border-bottom: 1px solid #444;
+}
+
+#highscores-list li:last-child {
+    border-bottom: none;
+}
+
+#mobile-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(2, 50px);
+    gap: 5px;
+    width: fit-content;
+    margin: 10px auto 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+#mobile-controls button {
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    font-size: 24px;
+    background-color: #333;
+    border: 1px solid #555;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#mobile-controls button:hover {
+    background-color: #444;
+}
+
+#left {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+#rotate {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#right {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+#down {
+    grid-column: 2;
+    grid-row: 2;
+}
