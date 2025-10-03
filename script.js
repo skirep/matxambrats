@@ -296,28 +296,25 @@ function movePiece(dir, speedMultiplier = 1) {
             currentX--;
         }
     } else if (dir === 'down') {
+        const previousY = currentY;
         const previousPixelY = pixelY;
         pixelY += 10 * speedMultiplier; // cada unitat = 10px; botó web usa 3 => 30px
         
-        if (checkCollision()) {
-            pixelY = previousPixelY;
-            if (pixelY === previousPixelY) {
-                mergePiece();
-                checkRows();
-                if (!isAnimating) {
-                    createPiece();
-                }
-            }
-        } else if (pixelY >= blockSize) {
+        // Normalitzar pixelY si supera blockSize
+        while (pixelY >= blockSize) {
             currentY++;
-            pixelY = 0;
-            if (checkCollision()) {
-                currentY--;
-                mergePiece();
-                checkRows();
-                if (!isAnimating) {
-                    createPiece();
-                }
+            pixelY -= blockSize;
+        }
+        
+        if (checkCollision()) {
+            // Revertir tots els canvis
+            currentY = previousY;
+            pixelY = previousPixelY;
+            // Si no hem pogut moure, la peça ha tocat fons
+            mergePiece();
+            checkRows();
+            if (!isAnimating) {
+                createPiece();
             }
         }
     }
@@ -347,7 +344,7 @@ function rotatePiece() {
 }
 
 function checkCollision() {
-    const yWithPixels = currentY + Math.floor((pixelY + blockSize - 1) / blockSize);
+    const yWithPixels = currentY + Math.floor(pixelY / blockSize);
     
     for (let y = 0; y < currentPiece.length; y++) {
         const boardY = y + yWithPixels;
