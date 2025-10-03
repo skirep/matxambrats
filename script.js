@@ -270,7 +270,7 @@ function checkCollision() {
                     return true;
                 }
                 // Comprova col·lisió amb altres peces
-                if (board[y + yWithPixels] && board[yWithPixels][x + currentX] !== 0) {
+                if (board[y + yWithPixels] && board[y + yWithPixels][x + currentX] !== 0) {
                     return true;
                 }
             }
