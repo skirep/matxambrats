@@ -10,24 +10,28 @@
 <body>
     <div id="menu">
         <h1>Dejoco Blocks</h1>
-        <button id="new-game">New Game</button>
-        <button id="highscores">Highscores</button>
-        <button id="credits">Credits</button>
+        <div class="language-selector">
+            <button id="lang-ca" class="lang-btn active">Català</button>
+            <button id="lang-en" class="lang-btn">English</button>
+        </div>
+        <button id="new-game" data-ca="Nova Partida" data-en="New Game">Nova Partida</button>
+        <button id="highscores" data-ca="Puntuacions" data-en="Highscores">Puntuacions</button>
+        <button id="credits" data-ca="Crèdits" data-en="Credits">Crèdits</button>
     </div>
     <div id="game-container" style="display: none;">
         <canvas id="game-canvas"></canvas>
         <div id="game-info">
             <div class="game-stats">
                 <div>
-                    <h3>Score</h3>
+                    <h3 data-ca="Puntuació" data-en="Score">Puntuació</h3>
                     <p id="score">0</p>
                 </div>
                 <div>
-                    <h3>Time</h3>
+                    <h3 data-ca="Temps" data-en="Time">Temps</h3>
                     <p id="timer">00:00</p>
                 </div>
             </div>
-            <h3>Next</h3>
+            <h3 data-ca="Següent" data-en="Next">Següent</h3>
             <canvas id="next-piece-canvas"></canvas>
             <div id="mobile-controls">
                 <button id="left">&#x2B05;</button>
@@ -38,11 +42,11 @@
         </div>
     </div>
     <div id="highscores-screen" style="display: none;">
-        <h1>High Scores</h1>
+        <h1 data-ca="Puntuacions Altes" data-en="High Scores">Puntuacions Altes</h1>
         <ul id="highscores-list">
             <!-- Scores will be populated by script.js -->
         </ul>
-        <button id="back-to-menu">Back to Menu</button>
+        <button id="back-to-menu" data-ca="Tornar al Menú" data-en="Back to Menu">Tornar al Menú</button>
     </div>
 </body>
 </html>

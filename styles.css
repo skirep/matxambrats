@@ -39,6 +39,27 @@ body {
     background-color: #444;
 }
 
+.language-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.lang-btn {
+    padding: 5px 15px;
+    font-size: 16px;
+    background-color: #333;
+    border: 1px solid #555;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.lang-btn.active {
+    background-color: #FFE138;
+    color: #000;
+}
+
 .music-control {
     margin-top: 10px;
     display: flex;
@@ -70,23 +91,25 @@ body {
         justify-content: flex-start;
         padding-bottom: 20px;
         overflow-y: visible;
+        height: auto;
+        max-height: none;
     }
 
     #game-canvas {
-        width: 70vw !important; /* Forcem que el canvas sigui més petit */
+        width: 60vw !important; /* Fem el tauler encara més petit */
         height: auto !important;
         margin-bottom: 10px;
     }
 
     #game-info {
-        position: static; /* Eliminem la posició fixa */
+        position: static;
         display: flex;
         flex-direction: column;
         align-items: center;
         padding: 10px;
         background: rgba(0, 0, 0, 0.9);
         border-radius: 10px;
-        width: 70vw;
+        width: 60vw;
         margin: 0 auto;
     }
 
@@ -99,23 +122,30 @@ body {
 
     #score, #timer {
         margin: 0;
-        font-size: 1.2em;
+        font-size: 1em;
     }
 
     #next-piece-canvas {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         margin-bottom: 10px;
     }
 
     #mobile-controls {
         width: 100%;
-        max-width: 200px;
+        max-width: 180px;
         margin: 0 auto;
+        gap: 3px;
     }
 
     #mobile-controls button {
-        height: 40px;
+        height: 35px;
+        font-size: 20px;
+    }
+
+    body {
+        padding: 5px;
+        overflow-y: hidden;
     }
 }
 

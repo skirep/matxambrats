@@ -85,6 +85,40 @@ let isAnimating = false;
 let animationFrame = 0;
 let isGameActive = false;
 
+let currentLanguage = 'ca';
+
+const translations = {
+    gameOver: {
+        ca: 'Fi del joc! La teva puntuació: ',
+        en: 'Game Over! Your score: '
+    },
+    noScores: {
+        ca: 'Encara no hi ha puntuacions!',
+        en: 'No scores yet!'
+    },
+    credits: {
+        ca: 'Dejoco Blocks\nDesenvolupat per un assistent d\'IA',
+        en: 'Dejoco Blocks\nDeveloped by an AI assistant'
+    }
+};
+
+function updateLanguage(lang) {
+    currentLanguage = lang;
+    document.querySelectorAll('[data-' + lang + ']').forEach(element => {
+        element.textContent = element.getAttribute('data-' + lang);
+    });
+    
+    // Actualitzar classe activa dels botons d'idioma
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById('lang-' + lang).classList.add('active');
+}
+
+// Event listeners per als botons d'idioma
+document.getElementById('lang-ca').addEventListener('click', () => updateLanguage('ca'));
+document.getElementById('lang-en').addEventListener('click', () => updateLanguage('en'));
+
 // Funció per ajustar la mida del canvas
 function resizeGame() {
     const container = document.getElementById('game-container');
@@ -346,7 +380,7 @@ function gameOver() {
     isGameActive = false;
     clearInterval(timerInterval);
     saveHighscore();
-    alert(`Game Over! Your score: ${score}`);
+    alert(translations.gameOver[currentLanguage] + score);
     document.getElementById('game-container').style.display = 'none';
     document.getElementById('menu').style.display = 'flex';
 }
@@ -389,7 +423,7 @@ function showHighscores() {
     
     highscoresList.innerHTML = '';
     if (highscores.length === 0) {
-        highscoresList.innerHTML = '<li>No scores yet!</li>';
+        highscoresList.innerHTML = '<li>' + translations.noScores[currentLanguage] + '</li>';
     } else {
         highscores
             .sort((a, b) => b - a)
@@ -409,5 +443,5 @@ function saveHighscore() {
 }
 
 function showCredits() {
-    alert('Dejoco Blocks\nDeveloped by a helpful AI assistant');
+    alert(translations.credits[currentLanguage]);
 }
