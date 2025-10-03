@@ -86,6 +86,7 @@ body {
     padding-bottom: 20px;
 }
 
+/* --- MOBILE LAYOUT CONSOLIDATED --- */
 @media (max-width: 767px) {
     body {
         padding: 5px;
@@ -93,7 +94,6 @@ body {
         height: 100vh;
         width: 100vw;
     }
-
     #game-container {
         flex-direction: row !important;
         align-items: flex-start;
@@ -105,15 +105,13 @@ body {
         padding: 4px;
         box-sizing: border-box;
     }
-
     #game-canvas {
-        width: 55vw !important; /* Tauler reduït per deixar espai als controls */
+        width: 50vw !important; /* Tauler més compacte */
         height: auto !important;
         margin: 0;
     }
-
     #game-info {
-        width: 35vw !important;
+        width: 40vw !important;
         max-width: none;
         position: static !important;
         background: transparent !important;
@@ -124,35 +122,23 @@ body {
         align-items: stretch;
         gap: 8px;
     }
-
     .game-stats {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         gap: 6px;
     }
-
-    .game-stats h3 {
-        font-size: 0.8em;
-        margin: 0;
-    }
-
-    #score, #timer {
-        font-size: 1em;
-        margin: 0;
-    }
-
+    .game-stats h3 { font-size: 0.75em; margin: 0; }
+    #score, #timer { font-size: 0.95em; margin: 0; }
     #next-piece-canvas {
         width: 100%;
         aspect-ratio: 1 / 1;
-        max-width: 90px;
+        max-width: 70px;
         height: auto;
     }
-
     #mobile-controls {
         width: 100%;
-        max-width: none;
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(0,0,0,0.45);
         padding: 6px;
         border-radius: 8px;
         display: grid;
@@ -161,84 +147,12 @@ body {
         gap: 4px;
         margin: 0;
     }
-
     #mobile-controls button {
         width: 100%;
         aspect-ratio: 1 / 1;
-        font-size: 18px;
+        font-size: 16px;
         height: auto;
         padding: 0;
-    }
-
-    h3 {
-        font-size: 0.9em;
-        margin: 0;
-    }
-
-    #score, #timer {
-        font-size: 1em;
-        margin: 0;
-    }
-
-    #game-container {
-        justify-content: flex-start;
-        padding-bottom: 20px;
-        overflow-y: visible;
-        height: auto;
-        max-height: none;
-    }
-
-    #game-canvas {
-        width: 60vw !important; /* Fem el tauler encara més petit */
-        height: auto !important;
-        margin-bottom: 10px;
-    }
-
-    #game-info {
-        position: static;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 10px;
-        background: rgba(0, 0, 0, 0.9);
-        border-radius: 10px;
-        width: 60vw;
-        margin: 0 auto;
-    }
-
-    .game-stats {
-        display: flex;
-        justify-content: space-around;
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    #score, #timer {
-        margin: 0;
-        font-size: 1em;
-    }
-
-    #next-piece-canvas {
-        width: 50px;
-        height: 50px;
-        margin-bottom: 10px;
-    }
-
-    #mobile-controls {
-        width: 100%;
-        max-width: 180px;
-        margin: 0 auto;
-        gap: 3px;
-    }
-
-    #mobile-controls button {
-        height: 35px;
-        font-size: 20px;
-    }
-
-    body {
-        padding: 5px;
-        overflow-y: hidden;
     }
 }
 
