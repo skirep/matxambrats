@@ -22,6 +22,7 @@
             <input id="player-name" type="text" maxlength="12" placeholder="Player" />
         </div>
         <button id="new-game" data-ca="Nova Partida" data-en="New Game">Nova Partida</button>
+        <button id="how-to-play" data-ca="Com Jugar" data-en="How to Play">Com Jugar</button>
         <button id="highscores" data-ca="Puntuacions" data-en="Highscores">Puntuacions</button>
         <button id="credits" data-ca="Crèdits" data-en="Credits">Crèdits</button>
         <button id="clear-local-scores" data-ca="Esborrar Puntuacions Locals" data-en="Clear Local Scores">Esborrar Puntuacions Locals</button>
@@ -72,6 +73,111 @@
         <div class="highscores-actions">
             <button id="refresh-highscores" data-ca="Refrescar" data-en="Refresh">Refrescar</button>
             <button id="back-to-menu" data-ca="Tornar al Menú" data-en="Back to Menu">Tornar al Menú</button>
+        </div>
+    </div>
+    <div id="instructions-screen" style="display: none;">
+        <h1 data-ca="Com Jugar" data-en="How to Play">Com Jugar</h1>
+        <div class="instructions-content">
+            <section class="instruction-section">
+                <h3 data-ca="Objectiu" data-en="Objective">Objectiu</h3>
+                <p data-ca="Completa línies horitzontals col·locant les peces que cauen. Quan una línia està completa, desapareix i guanyes punts!" data-en="Complete horizontal lines by placing the falling pieces. When a line is complete, it disappears and you earn points!">Completa línies horitzontals col·locant les peces que cauen. Quan una línia està completa, desapareix i guanyes punts!</p>
+            </section>
+            
+            <section class="instruction-section">
+                <h3 data-ca="Controls d'Ordinador" data-en="Desktop Controls">Controls d'Ordinador</h3>
+                <div class="controls-grid">
+                    <div class="control-item">
+                        <span class="control-key">←</span>
+                        <span data-ca="Moure esquerra" data-en="Move left">Moure esquerra</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-key">→</span>
+                        <span data-ca="Moure dreta" data-en="Move right">Moure dreta</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-key">↓</span>
+                        <span data-ca="Baixar ràpid" data-en="Drop faster">Baixar ràpid</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-key">↑</span>
+                        <span data-ca="Rotar peça" data-en="Rotate piece">Rotar peça</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-key" data-ca="Espai" data-en="Space">Espai</span>
+                        <span data-ca="Pausa" data-en="Pause">Pausa</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="instruction-section">
+                <h3 data-ca="Controls Mòbils" data-en="Mobile Controls">Controls Mòbils</h3>
+                <p data-ca="Utilitza els botons a la pantalla:" data-en="Use the on-screen buttons:">Utilitza els botons a la pantalla:</p>
+                <div class="mobile-controls-demo">
+                    <div class="demo-button">⬅️ <span data-ca="Esquerra" data-en="Left">Esquerra</span></div>
+                    <div class="demo-button">🔄 <span data-ca="Rotar" data-en="Rotate">Rotar</span></div>
+                    <div class="demo-button">➡️ <span data-ca="Dreta" data-en="Right">Dreta</span></div>
+                    <div class="demo-button">⬇️ <span data-ca="Avall" data-en="Down">Avall</span></div>
+                </div>
+            </section>
+
+            <section class="instruction-section">
+                <h3 data-ca="Peces del Joc" data-en="Game Pieces">Peces del Joc</h3>
+                <p data-ca="Hi ha 7 tipus diferents de peces (tetrominos):" data-en="There are 7 different types of pieces (tetrominos):">Hi ha 7 tipus diferents de peces (tetrominos):</p>
+                <div class="pieces-grid">
+                    <div class="piece-demo">
+                        <div class="piece-visual piece-i"></div>
+                        <span>I</span>
+                    </div>
+                    <div class="piece-demo">
+                        <div class="piece-visual piece-o"></div>
+                        <span>O</span>
+                    </div>
+                    <div class="piece-demo">
+                        <div class="piece-visual piece-t"></div>
+                        <span>T</span>
+                    </div>
+                    <div class="piece-demo">
+                        <div class="piece-visual piece-l"></div>
+                        <span>L</span>
+                    </div>
+                    <div class="piece-demo">
+                        <div class="piece-visual piece-j"></div>
+                        <span>J</span>
+                    </div>
+                    <div class="piece-demo">
+                        <div class="piece-visual piece-s"></div>
+                        <span>S</span>
+                    </div>
+                    <div class="piece-demo">
+                        <div class="piece-visual piece-z"></div>
+                        <span>Z</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="instruction-section">
+                <h3 data-ca="Sistema de Puntuació" data-en="Scoring System">Sistema de Puntuació</h3>
+                <ul class="scoring-list">
+                    <li><strong>1 línia:</strong> 100 <span data-ca="punts" data-en="points">punts</span></li>
+                    <li><strong>2 línies:</strong> 300 <span data-ca="punts" data-en="points">punts</span></li>
+                    <li><strong>3 línies:</strong> 500 <span data-ca="punts" data-en="points">punts</span></li>
+                    <li><strong>4 línies (Tetris!):</strong> 800 <span data-ca="punts" data-en="points">punts</span></li>
+                </ul>
+                <p data-ca="El joc es fa més ràpid cada 1000 punts!" data-en="The game gets faster every 1000 points!">El joc es fa més ràpid cada 1000 punts!</p>
+            </section>
+
+            <section class="instruction-section">
+                <h3 data-ca="Consells" data-en="Tips">Consells</h3>
+                <ul class="tips-list">
+                    <li data-ca="Intenta deixar espai per a les peces llargues (I)" data-en="Try to leave space for the long pieces (I)">Intenta deixar espai per a les peces llargues (I)</li>
+                    <li data-ca="No deixis forats entre les peces" data-en="Don't leave gaps between pieces">No deixis forats entre les peces</li>
+                    <li data-ca="Planifica amb antelació mirant la següent peça" data-en="Plan ahead by looking at the next piece">Planifica amb antelació mirant la següent peça</li>
+                    <li data-ca="Mantén les línies al nivell més baix possible" data-en="Keep the lines as low as possible">Mantén les línies al nivell més baix possible</li>
+                </ul>
+            </section>
+        </div>
+        <div class="instructions-actions">
+            <button id="back-to-menu-instructions" data-ca="Tornar al Menú" data-en="Back to Menu">Tornar al Menú</button>
         </div>
     </div>
     <audio id="bg-music" src="tetris.mp3" preload="auto" loop style="display:none"></audio>

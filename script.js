@@ -1,4 +1,5 @@
 document.getElementById('new-game').addEventListener('click', handleNewGameClick);
+document.getElementById('how-to-play').addEventListener('click', showInstructions);
 document.getElementById('highscores').addEventListener('click', showHighscores);
 document.getElementById('credits').addEventListener('click', showCredits);
 document.getElementById('back-to-menu').addEventListener('click', () => {
@@ -6,6 +7,10 @@ document.getElementById('back-to-menu').addEventListener('click', () => {
     history.back();
 });
 document.getElementById('back-to-menu-game').addEventListener('click', () => {
+    // Use history.back() to trigger popstate for proper navigation
+    history.back();
+});
+document.getElementById('back-to-menu-instructions').addEventListener('click', () => {
     // Use history.back() to trigger popstate for proper navigation
     history.back();
 });
@@ -283,6 +288,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Check if we're on the highscores screen
         else if (document.getElementById('highscores-screen').style.display !== 'none') {
             document.getElementById('highscores-screen').style.display = 'none';
+            document.getElementById('menu').style.display = 'flex';
+            updateNewGameButton();
+        }
+        // Check if we're on the instructions screen
+        else if (document.getElementById('instructions-screen').style.display !== 'none') {
+            document.getElementById('instructions-screen').style.display = 'none';
             document.getElementById('menu').style.display = 'flex';
             updateNewGameButton();
         }
@@ -844,6 +855,15 @@ function sanitizePlayerName(name) {
 function showCredits() {
     if (isGameActive && !confirm(translations.confirmExit[currentLanguage])) return;
     alert(translations.credits[currentLanguage]);
+}
+
+function showInstructions() {
+    if (isGameActive && !confirm(translations.confirmExit[currentLanguage])) return;
+    isGameActive = false;
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('instructions-screen').style.display = 'flex';
+    // Add history entry for back button navigation
+    history.pushState({ screen: 'instructions' }, '', '');
 }
 
 // Music control logic
