@@ -2,11 +2,13 @@ document.getElementById('new-game').addEventListener('click', handleNewGameClick
 document.getElementById('highscores').addEventListener('click', showHighscores);
 document.getElementById('credits').addEventListener('click', showCredits);
 document.getElementById('back-to-menu').addEventListener('click', () => {
-    document.getElementById('highscores-screen').style.display = 'none';
-    document.getElementById('menu').style.display = 'flex';
-    updateNewGameButton();
+    // Use history.back() to trigger popstate for proper navigation
+    history.back();
 });
-document.getElementById('back-to-menu-game').addEventListener('click', returnToMenu);
+document.getElementById('back-to-menu-game').addEventListener('click', () => {
+    // Use history.back() to trigger popstate for proper navigation
+    history.back();
+});
 
 // Mobile control buttons with hold-to-repeat functionality
 let buttonRepeatInterval = null;
@@ -272,11 +274,17 @@ document.addEventListener('DOMContentLoaded', () => {
         pauseBtn.addEventListener('click', togglePause);
     }
 
-    // Handle mobile back button to return to menu during game
+    // Handle browser back button to return to menu from any screen
     window.addEventListener('popstate', (event) => {
-        if (isGameActive && document.getElementById('game-container').style.display !== 'none') {
-            event.preventDefault();
+        // Check if we're on the game screen
+        if (document.getElementById('game-container').style.display !== 'none') {
             returnToMenu();
+        }
+        // Check if we're on the highscores screen
+        else if (document.getElementById('highscores-screen').style.display !== 'none') {
+            document.getElementById('highscores-screen').style.display = 'none';
+            document.getElementById('menu').style.display = 'flex';
+            updateNewGameButton();
         }
     });
 });
@@ -643,6 +651,8 @@ function resumeGame() {
     // Show game and hide menu
     document.getElementById('menu').style.display = 'none';
     document.getElementById('game-container').style.display = 'flex';
+    // Add history entry for back button navigation
+    history.pushState({ screen: 'game' }, '', '');
     
     // Resume if paused
     if (isPaused) {
@@ -653,6 +663,8 @@ function resumeGame() {
 function startGame() {
     document.getElementById('menu').style.display = 'none';
     document.getElementById('game-container').style.display = 'flex';
+    // Add history entry for back button navigation
+    history.pushState({ screen: 'game' }, '', '');
     board.forEach(row => row.fill(0));
     score = 0;
     scoreElement.textContent = score;
@@ -810,6 +822,8 @@ function showHighscores() {
     document.getElementById('menu').style.display = 'none';
     document.getElementById('highscores-screen').style.display = 'flex';
     loadHighscores(50);
+    // Add history entry for back button navigation
+    history.pushState({ screen: 'highscores' }, '', '');
 }
 
 function saveHighscore() {
