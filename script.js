@@ -271,10 +271,11 @@ function draw(timestamp = 0) {
     // Draw landed pieces
     drawMatrix(board, 0, 0, context);
     
-    // Draw current piece with pixel-perfect position
+    // Draw current piece at collision-checked position to prevent visual overlap
     if (!isAnimating && currentPiece) {
-        const drawY = currentY + (pixelY / blockSize);
-        drawMatrix(currentPiece, currentX, drawY, context);
+        // Use the same calculation as checkCollision to prevent visual overlap
+        const yWithPixels = currentY + Math.floor(pixelY / blockSize);
+        drawMatrix(currentPiece, currentX, yWithPixels, context);
     }
 
     if (isGameActive) {
