@@ -770,7 +770,6 @@ async function fetchRemoteHighscores(limit = 10) {
         if (!firestoreEnabled) return null;
         const snap = await firestore.collection('highscores')
             .orderBy('score', 'desc')
-            .orderBy('time', 'asc')
             .limit(limit)
             .get();
         return snap.docs.map(d => d.data());
