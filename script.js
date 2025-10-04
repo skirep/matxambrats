@@ -743,7 +743,7 @@ function initFirebase() {
     }
 }
 
-async function saveRemoteHighscore(name, scoreValue) {
+async function saveRemoteHighscore(name, scoreValue, timeValue) {
     try {
         initFirebase();
         if (!firestoreEnabled) return; // Sense config -> sortim
@@ -751,6 +751,7 @@ async function saveRemoteHighscore(name, scoreValue) {
         await firestore.collection('highscores').add({
             name: safeName,
             score: scoreValue,
+            time: timeValue,
             ts: Date.now()
         });
     } catch (e) {
@@ -764,6 +765,7 @@ async function fetchRemoteHighscores(limit = 10) {
         if (!firestoreEnabled) return null;
         const snap = await firestore.collection('highscores')
             .orderBy('score', 'desc')
+            .orderBy('time', 'asc')
             .limit(limit)
             .get();
         return snap.docs.map(d => d.data());
@@ -800,6 +802,12 @@ function renderHighscoreList(entries, isRemote) {
         const pos = document.createElement('span'); pos.className='pos'; pos.textContent = (i+1)+'.';
         const name = document.createElement('span'); name.className='name'; name.textContent = medal ? medal+' '+entry.name : entry.name;
         const scoreSpan = document.createElement('span'); scoreSpan.className='score'; scoreSpan.textContent = entry.score + ' ' + translations.pointsSuffix[currentLanguage];
+        const timeSpan = document.createElement('span'); timeSpan.className='time';
+        if (entry.time !== undefined && entry.time !== null) {
+            const minutes = Math.floor(entry.time / 60).toString().padStart(2, '0');
+            const seconds = (entry.time % 60).toString().padStart(2, '0');
+            timeSpan.textContent = `${minutes}:${seconds}`;
+        }
         const dateSpan = document.createElement('span'); dateSpan.className='date';
         if (entry.ts) {
             const d = new Date(entry.ts);
@@ -808,6 +816,7 @@ function renderHighscoreList(entries, isRemote) {
         li.appendChild(pos);
         li.appendChild(name);
         li.appendChild(scoreSpan);
+        li.appendChild(timeSpan);
         li.appendChild(dateSpan);
         list.appendChild(li);
     });
@@ -818,11 +827,27 @@ async function loadHighscores(limit=50) {
     highscoresList.innerHTML = '<li>Loading...</li>';
     let remote = await fetchRemoteHighscores(limit);
     if (remote && remote.length > 0) {
-        renderHighscoreList(remote.map(r=>({name:r.name, score:r.score, ts:r.ts})), true);
+        renderHighscoreList(remote.map(r=>({name:r.name, score:r.score, time:r.time, ts:r.ts})), true);
     } else {
-        const local = (JSON.parse(localStorage.getItem('tetrisHighscores')) || [])
-            .sort((a,b)=>b-a).slice(0, limit)
-            .map(s=>({name:'—', score:s, ts:null}));
+        let local = JSON.parse(localStorage.getItem('tetrisHighscores')) || [];
+        // Handle both old format (numbers) and new format (objects)
+        local = local.map(entry => {
+            if (typeof entry === 'number') {
+                return { score: entry, time: null };
+            }
+            return entry;
+        });
+        // Sort by score descending, then by time ascending
+        local.sort((a, b) => {
+            if (b.score !== a.score) {
+                return b.score - a.score;
+            }
+            // For same score, sort by time (ascending, lower time is better)
+            if (a.time === null || a.time === undefined) return 1;
+            if (b.time === null || b.time === undefined) return -1;
+            return a.time - b.time;
+        });
+        local = local.slice(0, limit).map(s => ({name:'—', score:s.score, time:s.time, ts:null}));
         renderHighscoreList(local, false);
     }
 }
@@ -840,11 +865,11 @@ function showHighscores() {
 function saveHighscore() {
     if (score < 10) return; // Ignorem puntuacions massa baixes
     const highscores = JSON.parse(localStorage.getItem('tetrisHighscores')) || [];
-    highscores.push(score);
+    highscores.push({ score: score, time: elapsedTime });
     localStorage.setItem('tetrisHighscores', JSON.stringify(highscores));
     // Enviar també a Firestore
     const playerName = sanitizePlayerName((playerNameInput && playerNameInput.value.trim()) || 'Player');
-    saveRemoteHighscore(playerName, score);
+    saveRemoteHighscore(playerName, score, elapsedTime);
 }
 
 function sanitizePlayerName(name) {
