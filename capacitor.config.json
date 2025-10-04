@@ -1,0 +1,8 @@
+{
+  "appId": "com.dejocoarts.blocks",
+  "appName": "Dejoco Blocks",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
