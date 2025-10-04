@@ -1,10 +1,12 @@
-document.getElementById('new-game').addEventListener('click', startGame);
+document.getElementById('new-game').addEventListener('click', handleNewGameClick);
 document.getElementById('highscores').addEventListener('click', showHighscores);
 document.getElementById('credits').addEventListener('click', showCredits);
 document.getElementById('back-to-menu').addEventListener('click', () => {
     document.getElementById('highscores-screen').style.display = 'none';
     document.getElementById('menu').style.display = 'flex';
+    updateNewGameButton();
 });
+document.getElementById('back-to-menu-game').addEventListener('click', returnToMenu);
 
 document.getElementById('left').addEventListener('click', () => movePiece('left'));
 document.getElementById('rotate').addEventListener('click', () => rotatePiece());
@@ -122,7 +124,9 @@ const translations = {
     level: { ca: 'Nivell', en: 'Level' },
     pointsSuffix: { ca: 'pts', en: 'pts' },
     pause: { ca: 'Pausa', en: 'Pause' },
-    resume: { ca: 'Reprendre', en: 'Resume' }
+    resume: { ca: 'Reprendre', en: 'Resume' },
+    continueGame: { ca: 'Continuar', en: 'Continue' },
+    newGame: { ca: 'Nova Partida', en: 'New Game' }
 };
 
 // Funció per actualitzar l'idioma
@@ -506,6 +510,7 @@ function gameOver() {
     alert(translations.gameOver[currentLanguage] + score);
     document.getElementById('game-container').style.display = 'none';
     document.getElementById('menu').style.display = 'flex';
+    updateNewGameButton();
 }
 
 function updateTimer() {
@@ -513,6 +518,58 @@ function updateTimer() {
     const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
     const seconds = (elapsedTime % 60).toString().padStart(2, '0');
     document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+}
+
+function handleNewGameClick() {
+    if (isGameActive) {
+        // Resume game if one is already active
+        resumeGame();
+    } else {
+        // Start new game
+        startGame();
+    }
+}
+
+function updateNewGameButton() {
+    const newGameBtn = document.getElementById('new-game');
+    if (isGameActive) {
+        newGameBtn.textContent = translations.continueGame[currentLanguage];
+        newGameBtn.setAttribute('data-ca', translations.continueGame.ca);
+        newGameBtn.setAttribute('data-en', translations.continueGame.en);
+    } else {
+        newGameBtn.textContent = translations.newGame[currentLanguage];
+        newGameBtn.setAttribute('data-ca', translations.newGame.ca);
+        newGameBtn.setAttribute('data-en', translations.newGame.en);
+    }
+}
+
+function returnToMenu() {
+    if (!isGameActive) return;
+    
+    // Pause the game if it's not already paused
+    if (!isPaused) {
+        togglePause();
+    }
+    
+    // Hide game and show menu
+    document.getElementById('game-container').style.display = 'none';
+    document.getElementById('menu').style.display = 'flex';
+    
+    // Update the button text to show "Continue"
+    updateNewGameButton();
+}
+
+function resumeGame() {
+    if (!isGameActive) return;
+    
+    // Show game and hide menu
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('game-container').style.display = 'flex';
+    
+    // Resume if paused
+    if (isPaused) {
+        togglePause();
+    }
 }
 
 function startGame() {
@@ -558,6 +615,7 @@ function startGame() {
         bgMusic.muted = (savedMuted === 'true');
     }
     toggleMusic(true);
+    updateNewGameButton();
     requestAnimationFrame(draw);
 }
 
