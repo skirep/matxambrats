@@ -1,5 +1,5 @@
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Courier New', monospace;
     margin: 0;
     padding: 10px;
     display: flex;
@@ -7,11 +7,40 @@ body {
     justify-content: flex-start;
     align-items: center;
     min-height: 100vh;
-    background-color: #1a1a1a;
-    color: #fff;
+    background-color: #0f380f;
+    color: #9bbc0f;
     box-sizing: border-box;
     max-height: 100vh;
     overflow-y: auto;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+h1, h3 {
+    color: #9bbc0f;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+}
+
+input[type="text"] {
+    background-color: #306230;
+    border: 2px solid #0f380f;
+    color: #9bbc0f;
+    padding: 5px 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    background-color: #8bac0f;
+    color: #0f380f;
+}
+
+label {
+    color: #9bbc0f;
+    font-family: 'Courier New', monospace;
 }
 
 #menu, #highscores-screen {
@@ -26,17 +55,20 @@ body {
 #menu button, #highscores-screen button {
     padding: 10px 20px;
     font-size: 18px;
-    background-color: #333;
-    border: 1px solid #555;
-    color: #fff;
+    background-color: #306230;
+    border: 3px solid #0f380f;
+    color: #9bbc0f;
     cursor: pointer;
     width: 100%;
     max-width: 200px;
     text-align: center;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
 }
 
 #menu button:hover, #highscores-screen button:hover {
-    background-color: #444;
+    background-color: #8bac0f;
+    color: #0f380f;
 }
 
 .language-selector {
@@ -48,22 +80,24 @@ body {
 .lang-btn {
     padding: 5px 15px;
     font-size: 16px;
-    background-color: #333;
-    border: 1px solid #555;
-    color: #fff;
+    background-color: #306230;
+    border: 2px solid #0f380f;
+    color: #9bbc0f;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 0;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
 }
 
 .lang-btn.active {
-    background-color: #FFE138;
-    color: #000;
+    background-color: #8bac0f;
+    color: #0f380f;
 }
 
 .tagline {
     margin: -10px 0 10px 0;
     font-size: 14px;
-    color: #aaa;
+    color: #306230;
     font-style: italic;
 }
 
@@ -72,7 +106,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #fff;
+    color: #9bbc0f;
 }
 
 .music-control input[type="checkbox"] {
@@ -179,9 +213,13 @@ body {
 }
 
 #game-canvas {
-    border: 2px solid #fff;
+    border: 4px solid #0f380f;
     max-width: 100%;
     height: auto;
+    background-color: #9bbc0f;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
 }
 
 #game-info {
@@ -195,12 +233,16 @@ body {
 
 #game-info h3 {
     margin: 0;
+    color: #9bbc0f;
+    font-family: 'Courier New', monospace;
 }
 
 #score {
     font-size: 2em;
-    color: #FFE138;
+    color: #8bac0f;
     margin: 0;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
 }
 
 .game-buttons {
@@ -211,16 +253,17 @@ body {
 }
 
 #pause-btn, #back-to-menu-game {
-    padding: 10px 20px;
-    font-size: 24px;
-    background-color: #333;
-    border: 1px solid #555;
-    color: #fff;
+    padding: 10px 15px;
+    font-size: 18px;
+    background-color: #306230;
+    border: 3px solid #0f380f;
+    color: #9bbc0f;
     cursor: pointer;
-    border-radius: 5px;
-    width: 100%;
-    max-width: 150px;
+    border-radius: 0;
+    width: 48%;
     margin: 0;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
 }
 
 #back-to-menu-game {
@@ -228,21 +271,24 @@ body {
 }
 
 #pause-btn:hover, #back-to-menu-game:hover {
-    background-color: #444;
+    background-color: #8bac0f;
+    color: #0f380f;
 }
 
 #pause-btn.paused {
-    background-color: #FFE138;
-    color: #000;
+    background-color: #8bac0f;
+    color: #0f380f;
 }
 
 #next-piece-canvas {
     width: 120px;
     height: 120px;
-    background-color: #000;
-    border: 2px solid #fff;
+    background-color: #9bbc0f;
+    border: 3px solid #0f380f;
     margin: 0 auto;
     image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
 }
 
 #highscores-list {
@@ -261,17 +307,17 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 6px 10px;
-    border-bottom: 1px solid #333;
+    border-bottom: 2px solid #306230;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-#highscores-list li:nth-child(odd) { background: rgba(255,255,255,0.04); }
-#highscores-list li:nth-child(even) { background: rgba(0,0,0,0.2); }
-#highscores-list li.top-1 { background: linear-gradient(90deg, #ffd70033, #00000000); }
-#highscores-list li.top-2 { background: linear-gradient(90deg, #c0c0c033, #00000000); }
-#highscores-list li.top-3 { background: linear-gradient(90deg, #cd7f3233, #00000000); }
+#highscores-list li:nth-child(odd) { background: rgba(139,172,15,0.1); }
+#highscores-list li:nth-child(even) { background: rgba(48,98,48,0.2); }
+#highscores-list li.top-1 { background: linear-gradient(90deg, #8bac0f33, #00000000); }
+#highscores-list li.top-2 { background: linear-gradient(90deg, #8bac0f22, #00000000); }
+#highscores-list li.top-3 { background: linear-gradient(90deg, #8bac0f11, #00000000); }
 #highscores-list .pos { width: 38px; font-weight: bold; }
 #highscores-list .name { flex: 1; padding: 0 6px; }
 #highscores-list .score { width: 70px; text-align: right; }
