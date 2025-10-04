@@ -161,6 +161,13 @@ body {
         height: auto;
         padding: 0;
     }
+    .game-buttons {
+        gap: 6px;
+    }
+    #pause-btn, #back-to-menu-game {
+        font-size: 16px;
+        padding: 6px;
+    }
 }
 
 @media (min-width: 768px) {
@@ -196,6 +203,13 @@ body {
     margin: 0;
 }
 
+.game-buttons {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+}
+
 #pause-btn, #back-to-menu-game {
     padding: 10px 20px;
     font-size: 24px;
@@ -206,7 +220,7 @@ body {
     border-radius: 5px;
     width: 100%;
     max-width: 150px;
-    margin: 10px auto;
+    margin: 0;
 }
 
 #back-to-menu-game {
