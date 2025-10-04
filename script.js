@@ -25,6 +25,12 @@ document.addEventListener('keydown', (event) => {
         case 'ArrowDown':
             movePiece('down');
             break;
+        case ' ':
+        case 'p':
+        case 'P':
+            event.preventDefault();
+            togglePause();
+            break;
     }
 });
 
@@ -90,6 +96,7 @@ let elapsedTime = 0;
 let isAnimating = false;
 let animationFrame = 0;
 let isGameActive = false;
+let isPaused = false;
 
 let currentLanguage = 'ca';
 
@@ -113,7 +120,9 @@ const translations = {
     unmute: { ca: 'Activar', en: 'Unmute' },
     volume: { ca: 'Volum', en: 'Volume' },
     level: { ca: 'Nivell', en: 'Level' },
-    pointsSuffix: { ca: 'pts', en: 'pts' }
+    pointsSuffix: { ca: 'pts', en: 'pts' },
+    pause: { ca: 'Pausa', en: 'Pause' },
+    resume: { ca: 'Reprendre', en: 'Resume' }
 };
 
 // Funció per actualitzar l'idioma
@@ -179,6 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicialitzar l'idioma (només una vegada)
     updateLanguage(currentLanguage);
+    
+    // Event listener per al botó de pausa
+    const pauseBtn = document.getElementById('pause-btn');
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', togglePause);
+    }
 });
 
 // Funció per ajustar la mida del canvas
@@ -258,10 +273,12 @@ function draw(timestamp = 0) {
     const deltaTime = timestamp - lastTime;
     lastTime = timestamp;
 
-    dropCounter += deltaTime;
-    if (dropCounter > dropInterval) {
-        movePiece('down');
-        dropCounter = 0;
+    if (!isPaused) {
+        dropCounter += deltaTime;
+        if (dropCounter > dropInterval) {
+            movePiece('down');
+            dropCounter = 0;
+        }
     }
 
     // Clear board
@@ -278,13 +295,13 @@ function draw(timestamp = 0) {
         drawMatrix(currentPiece, currentX, yWithPixels, context);
     }
 
-    if (isGameActive) {
+    if (isGameActive && !isPaused) {
         requestAnimationFrame(draw);
     }
 }
 
 function movePiece(dir, speedMultiplier = 1) {
-    if (isAnimating) return;
+    if (isAnimating || isPaused) return;
     
     if (dir === 'left') {
         currentX--;
@@ -322,7 +339,7 @@ function movePiece(dir, speedMultiplier = 1) {
 }
 
 function rotatePiece() {
-    if (isAnimating) return;
+    if (isAnimating || isPaused) return;
     const originalPiece = currentPiece;
     const originalX = currentX;
     const rotated = [];
@@ -341,6 +358,42 @@ function rotatePiece() {
             currentX = originalX;
             return;
         }
+    }
+}
+
+function togglePause() {
+    if (!isGameActive) return;
+    
+    isPaused = !isPaused;
+    const pauseBtn = document.getElementById('pause-btn');
+    
+    if (isPaused) {
+        // Pause the game
+        clearInterval(timerInterval);
+        pauseBtn.classList.add('paused');
+        pauseBtn.textContent = '▶';
+        pauseBtn.setAttribute('data-ca', translations.resume.ca);
+        pauseBtn.setAttribute('data-en', translations.resume.en);
+        if (currentLanguage === 'ca') {
+            pauseBtn.setAttribute('title', 'Reprendre (Espai)');
+        } else {
+            pauseBtn.setAttribute('title', 'Resume (Space)');
+        }
+    } else {
+        // Resume the game
+        timerInterval = setInterval(updateTimer, 1000);
+        pauseBtn.classList.remove('paused');
+        pauseBtn.textContent = '⏸';
+        pauseBtn.setAttribute('data-ca', translations.pause.ca);
+        pauseBtn.setAttribute('data-en', translations.pause.en);
+        if (currentLanguage === 'ca') {
+            pauseBtn.setAttribute('title', 'Pausa (Espai)');
+        } else {
+            pauseBtn.setAttribute('title', 'Pause (Space)');
+        }
+        lastTime = performance.now();
+        dropCounter = 0;
+        requestAnimationFrame(draw);
     }
 }
 
@@ -475,6 +528,7 @@ function startGame() {
     elapsedTime = 0;
     isAnimating = false;
     isGameActive = true;
+    isPaused = false;
     lastTime = 0;
     dropCounter = 0;
     document.getElementById('timer').textContent = '00:00';
@@ -483,6 +537,19 @@ function startGame() {
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(updateTimer, 1000);
     resizeGame();
+    // Reset pause button state
+    const pauseBtn = document.getElementById('pause-btn');
+    if (pauseBtn) {
+        pauseBtn.classList.remove('paused');
+        pauseBtn.textContent = '⏸';
+        pauseBtn.setAttribute('data-ca', translations.pause.ca);
+        pauseBtn.setAttribute('data-en', translations.pause.en);
+        if (currentLanguage === 'ca') {
+            pauseBtn.setAttribute('title', 'Pausa (Espai)');
+        } else {
+            pauseBtn.setAttribute('title', 'Pause (Space)');
+        }
+    }
     // Restaurar volum/mute cada partida
     if (bgMusic) {
         const savedVolume = localStorage.getItem('dejocoBlocksVolume');
