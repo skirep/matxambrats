@@ -5,10 +5,12 @@ Tetris
 
 A modern Tetris game built with HTML5, CSS3, and JavaScript. This game supports:
 - Multiple languages (Català and English)
-- Mobile controls
+- In-game instructions screen with visual guides
+- Mobile and desktop controls
 - High scores with Firebase integration
 - Background music
 - Progressive difficulty levels
+- Game Boy-inspired retro design
 
 ## Play Online
 
@@ -64,6 +66,19 @@ The APK will be located at: `android/app/build/outputs/apk/release/app-release-u
 ### Automated Builds
 
 The project includes a GitHub Actions workflow that automatically builds the APK on every push to the main branch. The APK artifacts are available in the Actions tab of the repository.
+
+### Publishing to Google Play Store
+
+For complete instructions on preparing and publishing this app to Google Play Store, see:
+- **[PLAY_STORE_QUICK_START.md](PLAY_STORE_QUICK_START.md)** - Quick reference guide
+- **[PLAY_STORE_GUIDE.md](PLAY_STORE_GUIDE.md)** - Comprehensive step-by-step guide
+
+These guides cover:
+- Keystore generation and signing configuration
+- App icon creation
+- Privacy policy requirements
+- Store listing materials (screenshots, descriptions)
+- AAB/APK build and submission process
 
 ## Development
 
