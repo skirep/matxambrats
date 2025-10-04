@@ -571,7 +571,9 @@ function resumeGame() {
     timerInterval = setInterval(updateTimer, 1000);
     resizeGame();
     
-    // Don't clear pausedGameState yet - keep it in case they pause again
+    // Clear pausedGameState after resuming to prevent memory leaks
+    pausedGameState = null;
+    updateResumeButtonVisibility();
     requestAnimationFrame(draw);
 }
 
