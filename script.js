@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicialitzar l'idioma (només una vegada)
     updateLanguage(currentLanguage);
     
-    // Check resume button visibility
+    // Initialize resume button visibility based on existing paused game state
     updateResumeButtonVisibility();
 });
 
