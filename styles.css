@@ -196,7 +196,7 @@ body {
     margin: 0;
 }
 
-#pause-btn {
+#pause-btn, #back-to-menu-game {
     padding: 10px 20px;
     font-size: 24px;
     background-color: #333;
@@ -209,7 +209,11 @@ body {
     margin: 10px auto;
 }
 
-#pause-btn:hover {
+#back-to-menu-game {
+    font-size: 16px;
+}
+
+#pause-btn:hover, #back-to-menu-game:hover {
     background-color: #444;
 }
 
