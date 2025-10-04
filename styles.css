@@ -321,6 +321,7 @@ label {
 #highscores-list .pos { width: 38px; font-weight: bold; }
 #highscores-list .name { flex: 1; padding: 0 6px; }
 #highscores-list .score { width: 70px; text-align: right; }
+#highscores-list .time { width: 55px; text-align: right; opacity: 0.8; font-size: 12px; }
 #highscores-list .date { width: 70px; text-align: right; opacity: 0.7; font-size: 11px; }
 
 .highscores-actions { display: flex; gap: 10px; margin-top: 10px; }
@@ -329,6 +330,7 @@ label {
 @media (max-width: 480px) {
   #highscores-list { font-size: 12px; }
   #highscores-list .score { width: 60px; }
+  #highscores-list .time { width: 50px; font-size: 11px; }
   #highscores-list .date { display: none; }
 }
 
