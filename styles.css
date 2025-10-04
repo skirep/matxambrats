@@ -60,6 +60,13 @@ body {
     color: #000;
 }
 
+.tagline {
+    margin: -10px 0 10px 0;
+    font-size: 14px;
+    color: #aaa;
+    font-style: italic;
+}
+
 .music-control {
     margin-top: 10px;
     display: flex;
