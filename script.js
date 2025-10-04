@@ -843,8 +843,9 @@ async function loadHighscores(limit=50) {
                 return b.score - a.score;
             }
             // For same score, sort by time (ascending, lower time is better)
-            if (a.time === null || a.time === undefined) return 1;
-            if (b.time === null || b.time === undefined) return -1;
+            // Entries without time are treated as having the best time (0)
+            if (a.time === null || a.time === undefined) return -1;
+            if (b.time === null || b.time === undefined) return 1;
             return a.time - b.time;
         });
         local = local.slice(0, limit).map(s => ({name:'—', score:s.score, time:s.time, ts:null}));
