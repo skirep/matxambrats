@@ -1,0 +1,32 @@
+{
+  "name": "dejoco-blocks",
+  "version": "1.0.0",
+  "description": "Dejoco Blocks - A Tetris game by Dejoco Arts",
+  "main": "index.html",
+  "scripts": {
+    "build": "npm run copy",
+    "copy": "mkdir -p www && cp index.html script.js styles.css tetris.mp3 tetris.mid www/",
+    "cap:init": "cap init",
+    "cap:add:android": "cap add android",
+    "cap:sync": "cap sync",
+    "cap:open:android": "cap open android",
+    "android:build": "npm run build && npm run cap:sync && cd android && ./gradlew assembleDebug",
+    "android:build:release": "npm run build && npm run cap:sync && cd android && ./gradlew assembleRelease"
+  },
+  "keywords": [
+    "tetris",
+    "game",
+    "blocks",
+    "capacitor",
+    "android"
+  ],
+  "author": "Dejoco Arts",
+  "license": "ISC",
+  "devDependencies": {
+    "@capacitor/cli": "^5.5.1"
+  },
+  "dependencies": {
+    "@capacitor/android": "^5.5.1",
+    "@capacitor/core": "^5.5.1"
+  }
+}
