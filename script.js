@@ -60,15 +60,16 @@ let baseDropInterval = 400;
 nextPieceCanvas.width = 4 * blockSize;
 nextPieceCanvas.height = 4 * blockSize;
 
+// Game Boy colors - monochrome green palette
 const colors = [
     null,
-    '#FF0D72', // T
-    '#0DC2FF', // I
-    '#0DFF72', // O
-    '#F538FF', // L
-    '#FF8E0D', // J
-    '#FFE138', // S
-    '#3877FF', // Z
+    '#306230', // T - dark green
+    '#306230', // I - dark green
+    '#306230', // O - dark green
+    '#306230', // L - dark green
+    '#306230', // J - dark green
+    '#306230', // S - dark green
+    '#306230', // Z - dark green
 ];
 
 const tetrominos = {
@@ -198,6 +199,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pauseBtn) {
         pauseBtn.addEventListener('click', togglePause);
     }
+
+    // Handle mobile back button to return to menu during game
+    window.addEventListener('popstate', (event) => {
+        if (isGameActive && document.getElementById('game-container').style.display !== 'none') {
+            event.preventDefault();
+            returnToMenu();
+        }
+    });
 });
 
 // Funció per ajustar la mida del canvas
@@ -237,17 +246,14 @@ function drawBlock(x, y, color, ctx, offsetX = 0, offsetY = 0) {
     const pixelX = offsetX + (x * blockSize);
     const pixelY = offsetY + (y * blockSize);
     
+    // Main block color
     ctx.fillStyle = color;
     ctx.fillRect(pixelX, pixelY, blockSize, blockSize);
 
-    // Simple 3D/pixelated effect
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.fillRect(pixelX, pixelY, blockSize, 2);
-    ctx.fillRect(pixelX, pixelY, 2, blockSize);
-
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.fillRect(pixelX, pixelY + blockSize - 2, blockSize, 2);
-    ctx.fillRect(pixelX + blockSize - 2, pixelY, 2, blockSize);
+    // Game Boy style border (darker outline)
+    ctx.strokeStyle = '#0f380f';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(pixelX, pixelY, blockSize, blockSize);
 }
 
 function drawMatrix(matrix, offsetX, offsetY, ctx) {
@@ -263,7 +269,7 @@ function drawMatrix(matrix, offsetX, offsetY, ctx) {
 }
 
 function drawNextPiece() {
-    nextPieceContext.fillStyle = '#000';
+    nextPieceContext.fillStyle = '#9bbc0f';
     nextPieceContext.fillRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
 
     const matrix = nextPiece;
@@ -286,7 +292,7 @@ function draw(timestamp = 0) {
     }
 
     // Clear board
-    context.fillStyle = '#000';
+    context.fillStyle = '#9bbc0f';
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw landed pieces
