@@ -727,6 +727,11 @@ let firestoreEnabled = false; // Canvi a true automàtic després de config vàl
 
 function initFirebase() {
     if (firebaseApp) return;
+    // Check if firebase is available (CDN scripts loaded successfully)
+    if (typeof firebase === 'undefined') {
+        console.warn('Firebase no disponible (scripts bloquejats o no carregats). S\'utilitzarà només el mode local.');
+        return;
+    }
     // Introdueix aquí la teva configuració de Firebase (PLACEHOLDERS)
     const firebaseConfig = {
         apiKey: "AIzaSyAKe5KSEh71w1ik2ynRYBEyd9jWOY-Dl5U",
