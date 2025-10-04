@@ -189,6 +189,28 @@ body {
     margin: 0;
 }
 
+#pause-btn {
+    padding: 10px 20px;
+    font-size: 24px;
+    background-color: #333;
+    border: 1px solid #555;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 150px;
+    margin: 10px auto;
+}
+
+#pause-btn:hover {
+    background-color: #444;
+}
+
+#pause-btn.paused {
+    background-color: #FFE138;
+    color: #000;
+}
+
 #next-piece-canvas {
     width: 120px;
     height: 120px;
