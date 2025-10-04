@@ -276,6 +276,22 @@ body {
     background-color: #444;
 }
 
+#back-to-main-menu {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #555;
+    border: 1px solid #777;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+#back-to-main-menu:hover {
+    background-color: #666;
+}
+
 #left {
     grid-column: 1;
     grid-row: 2;

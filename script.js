@@ -1,10 +1,12 @@
 document.getElementById('new-game').addEventListener('click', startGame);
+document.getElementById('resume-game').addEventListener('click', resumeGame);
 document.getElementById('highscores').addEventListener('click', showHighscores);
 document.getElementById('credits').addEventListener('click', showCredits);
 document.getElementById('back-to-menu').addEventListener('click', () => {
     document.getElementById('highscores-screen').style.display = 'none';
     document.getElementById('menu').style.display = 'flex';
 });
+document.getElementById('back-to-main-menu').addEventListener('click', pauseGame);
 
 document.getElementById('left').addEventListener('click', () => movePiece('left'));
 document.getElementById('rotate').addEventListener('click', () => rotatePiece());
@@ -90,6 +92,7 @@ let elapsedTime = 0;
 let isAnimating = false;
 let animationFrame = 0;
 let isGameActive = false;
+let pausedGameState = null;
 
 let currentLanguage = 'ca';
 
@@ -179,6 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicialitzar l'idioma (només una vegada)
     updateLanguage(currentLanguage);
+    
+    // Check resume button visibility
+    updateResumeButtonVisibility();
 });
 
 // Funció per ajustar la mida del canvas
@@ -448,6 +454,8 @@ function updateLevel() {
 function gameOver() {
     isGameActive = false;
     clearInterval(timerInterval);
+    pausedGameState = null;
+    updateResumeButtonVisibility();
     saveHighscore();
     alert(translations.gameOver[currentLanguage] + score);
     document.getElementById('game-container').style.display = 'none';
@@ -462,6 +470,10 @@ function updateTimer() {
 }
 
 function startGame() {
+    // Clear paused state when starting new game
+    pausedGameState = null;
+    updateResumeButtonVisibility();
+    
     document.getElementById('menu').style.display = 'none';
     document.getElementById('game-container').style.display = 'flex';
     board.forEach(row => row.fill(0));
@@ -491,6 +503,83 @@ function startGame() {
     }
     toggleMusic(true);
     requestAnimationFrame(draw);
+}
+
+function pauseGame() {
+    if (!isGameActive) return;
+    
+    // Save game state
+    pausedGameState = {
+        board: board.map(row => [...row]),
+        score: score,
+        linesCleared: linesCleared,
+        elapsedTime: elapsedTime,
+        currentPiece: currentPiece,
+        nextPiece: nextPiece,
+        currentX: currentX,
+        currentY: currentY,
+        pixelY: pixelY,
+        dropInterval: dropInterval,
+        baseDropInterval: baseDropInterval
+    };
+    
+    // Stop game
+    isGameActive = false;
+    if (timerInterval) clearInterval(timerInterval);
+    
+    // Return to menu
+    document.getElementById('game-container').style.display = 'none';
+    document.getElementById('menu').style.display = 'flex';
+    updateResumeButtonVisibility();
+}
+
+function resumeGame() {
+    if (!pausedGameState) return;
+    
+    // Restore game state
+    pausedGameState.board.forEach((row, i) => {
+        board[i] = [...row];
+    });
+    score = pausedGameState.score;
+    scoreElement.textContent = score;
+    linesCleared = pausedGameState.linesCleared;
+    elapsedTime = pausedGameState.elapsedTime;
+    currentPiece = pausedGameState.currentPiece;
+    nextPiece = pausedGameState.nextPiece;
+    currentX = pausedGameState.currentX;
+    currentY = pausedGameState.currentY;
+    pixelY = pausedGameState.pixelY;
+    dropInterval = pausedGameState.dropInterval;
+    baseDropInterval = pausedGameState.baseDropInterval;
+    
+    // Update UI
+    updateLevel();
+    const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
+    const seconds = (elapsedTime % 60).toString().padStart(2, '0');
+    document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+    drawNextPiece();
+    
+    // Resume game
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('game-container').style.display = 'flex';
+    isAnimating = false;
+    isGameActive = true;
+    lastTime = 0;
+    dropCounter = 0;
+    
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(updateTimer, 1000);
+    resizeGame();
+    
+    // Don't clear pausedGameState yet - keep it in case they pause again
+    requestAnimationFrame(draw);
+}
+
+function updateResumeButtonVisibility() {
+    const resumeBtn = document.getElementById('resume-game');
+    if (resumeBtn) {
+        resumeBtn.style.display = pausedGameState ? 'block' : 'none';
+    }
 }
 
 // --- Firebase Highscores (Public Leaderboard) ---
