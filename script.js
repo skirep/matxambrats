@@ -8,10 +8,82 @@ document.getElementById('back-to-menu').addEventListener('click', () => {
 });
 document.getElementById('back-to-menu-game').addEventListener('click', returnToMenu);
 
-document.getElementById('left').addEventListener('click', () => movePiece('left'));
-document.getElementById('rotate').addEventListener('click', () => rotatePiece());
-document.getElementById('right').addEventListener('click', () => movePiece('right'));
-document.getElementById('down').addEventListener('click', () => movePiece('down', 3)); // 3 * 10px = 30px per clic
+// Mobile control buttons with hold-to-repeat functionality
+let buttonRepeatInterval = null;
+let buttonRepeatTimeout = null;
+
+function startButtonRepeat(action) {
+    // Clear any existing intervals
+    stopButtonRepeat();
+    
+    // Execute action immediately
+    action();
+    
+    // Wait a bit before starting to repeat (initial delay)
+    buttonRepeatTimeout = setTimeout(() => {
+        // Start repeating the action
+        buttonRepeatInterval = setInterval(action, 100); // Repeat every 100ms
+    }, 300); // Initial delay of 300ms
+}
+
+function stopButtonRepeat() {
+    if (buttonRepeatInterval) {
+        clearInterval(buttonRepeatInterval);
+        buttonRepeatInterval = null;
+    }
+    if (buttonRepeatTimeout) {
+        clearTimeout(buttonRepeatTimeout);
+        buttonRepeatTimeout = null;
+    }
+}
+
+// Left button
+const leftBtn = document.getElementById('left');
+leftBtn.addEventListener('mousedown', () => startButtonRepeat(() => movePiece('left')));
+leftBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startButtonRepeat(() => movePiece('left'));
+});
+leftBtn.addEventListener('mouseup', stopButtonRepeat);
+leftBtn.addEventListener('mouseleave', stopButtonRepeat);
+leftBtn.addEventListener('touchend', stopButtonRepeat);
+leftBtn.addEventListener('touchcancel', stopButtonRepeat);
+
+// Rotate button
+const rotateBtn = document.getElementById('rotate');
+rotateBtn.addEventListener('mousedown', () => startButtonRepeat(() => rotatePiece()));
+rotateBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startButtonRepeat(() => rotatePiece());
+});
+rotateBtn.addEventListener('mouseup', stopButtonRepeat);
+rotateBtn.addEventListener('mouseleave', stopButtonRepeat);
+rotateBtn.addEventListener('touchend', stopButtonRepeat);
+rotateBtn.addEventListener('touchcancel', stopButtonRepeat);
+
+// Right button
+const rightBtn = document.getElementById('right');
+rightBtn.addEventListener('mousedown', () => startButtonRepeat(() => movePiece('right')));
+rightBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startButtonRepeat(() => movePiece('right'));
+});
+rightBtn.addEventListener('mouseup', stopButtonRepeat);
+rightBtn.addEventListener('mouseleave', stopButtonRepeat);
+rightBtn.addEventListener('touchend', stopButtonRepeat);
+rightBtn.addEventListener('touchcancel', stopButtonRepeat);
+
+// Down button
+const downBtn = document.getElementById('down');
+downBtn.addEventListener('mousedown', () => startButtonRepeat(() => movePiece('down', 3)));
+downBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startButtonRepeat(() => movePiece('down', 3));
+});
+downBtn.addEventListener('mouseup', stopButtonRepeat);
+downBtn.addEventListener('mouseleave', stopButtonRepeat);
+downBtn.addEventListener('touchend', stopButtonRepeat);
+downBtn.addEventListener('touchcancel', stopButtonRepeat);
 
 document.addEventListener('keydown', (event) => {
     switch (event.key) {
