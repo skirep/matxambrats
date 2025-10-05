@@ -206,8 +206,25 @@ const translations = {
     pause: { ca: 'Pausa', en: 'Pause' },
     resume: { ca: 'Reprendre', en: 'Resume' },
     continueGame: { ca: 'Continuar', en: 'Continue' },
-    newGame: { ca: 'Nova Partida', en: 'New Game' }
+    newGame: { ca: 'Nova Partida', en: 'New Game' },
+    selectLanguage: { ca: 'Selecciona idioma', en: 'Select language' },
+    confirmClearData: { ca: 'Segur que vols esborrar totes les dades locals (puntuacions, configuració)?', en: 'Are you sure you want to clear all local data (scores, settings)?' },
+    dataClearedSuccess: { ca: 'Dades esborrades correctament', en: 'Data cleared successfully' }
 };
+
+// Function to select initial language on first visit
+function selectInitialLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('dejocoBlocksLang', lang);
+    localStorage.setItem('dejocoBlocksHasVisited', 'true');
+    
+    // Hide language selection screen and show menu
+    document.getElementById('language-selection-screen').style.display = 'none';
+    document.getElementById('menu').style.display = 'flex';
+    
+    // Update all text
+    updateLanguage(lang);
+}
 
 // Funció per actualitzar l'idioma
 function updateLanguage(lang) {
@@ -223,33 +240,107 @@ function updateLanguage(lang) {
         }
     });
     
-    // Actualitzar classe activa dels botons d'idioma
+    // Actualitzar classe activa dels botons d'idioma (menu principal)
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    document.getElementById('lang-' + lang).classList.add('active');
+    const mainLangBtn = document.getElementById('lang-' + lang);
+    if (mainLangBtn) mainLangBtn.classList.add('active');
+    
+    // Actualitzar classe activa dels botons d'idioma (settings)
+    const settingsLangBtn = document.getElementById('settings-lang-' + lang);
+    if (settingsLangBtn) settingsLangBtn.classList.add('active');
 
     // Actualitzar text botó mute segons estat
     if (musicMuteBtn) {
         musicMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
     }
+    const settingsMuteBtn = document.getElementById('settings-music-mute');
+    if (settingsMuteBtn) {
+        settingsMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
+    }
+}
+
+// Function to show settings screen
+function showSettings() {
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('settings-screen').style.display = 'flex';
+    history.pushState({ page: 'settings' }, '', '');
+    
+    // Sync settings with current values
+    const settingsMusicCheckbox = document.getElementById('settings-music-enabled');
+    if (settingsMusicCheckbox && musicCheckbox) {
+        settingsMusicCheckbox.checked = musicCheckbox.checked;
+    }
+    const settingsVolumeSlider = document.getElementById('settings-music-volume');
+    if (settingsVolumeSlider && musicVolumeSlider) {
+        settingsVolumeSlider.value = musicVolumeSlider.value;
+    }
+}
+
+// Function to clear all local data
+function clearAllLocalData() {
+    const confirmMsg = translations.confirmClearData[currentLanguage];
+    if (confirm(confirmMsg)) {
+        // Clear all localStorage items related to the game
+        localStorage.removeItem('tetrisHighscores');
+        localStorage.removeItem('dejocoBlocksLang');
+        localStorage.removeItem('dejocoBlocksMusic');
+        localStorage.removeItem('dejocoBlocksVolume');
+        localStorage.removeItem('dejocoBlocksMuted');
+        localStorage.removeItem('dejocoBlocksPlayerName');
+        localStorage.removeItem('dejocoBlocksHasVisited');
+        
+        alert(translations.dataClearedSuccess[currentLanguage]);
+        
+        // Reload the page to reset everything
+        window.location.reload();
+    }
 }
 
 // Event listeners per als botons d'idioma
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if this is the first visit (no language stored)
+    const storedLang = localStorage.getItem('dejocoBlocksLang');
+    const hasVisited = localStorage.getItem('dejocoBlocksHasVisited');
+    
+    if (!hasVisited) {
+        // First visit - show language selection screen
+        document.getElementById('language-selection-screen').style.display = 'flex';
+        document.getElementById('menu').style.display = 'none';
+        
+        // Set up language selection buttons
+        document.getElementById('select-lang-ca').addEventListener('click', () => {
+            selectInitialLanguage('ca');
+        });
+        document.getElementById('select-lang-en').addEventListener('click', () => {
+            selectInitialLanguage('en');
+        });
+    } else {
+        // Not first visit - restore language and show menu
+        if (storedLang === 'ca' || storedLang === 'en') {
+            currentLanguage = storedLang;
+        }
+        document.getElementById('language-selection-screen').style.display = 'none';
+        document.getElementById('menu').style.display = 'flex';
+    }
+    
     document.getElementById('lang-ca').addEventListener('click', () => updateLanguage('ca'));
     document.getElementById('lang-en').addEventListener('click', () => updateLanguage('en'));
     
-    // Restaurar idioma
-    const storedLang = localStorage.getItem('dejocoBlocksLang');
-    if (storedLang === 'ca' || storedLang === 'en') {
-        currentLanguage = storedLang;
-    }
+    // Settings screen language buttons
+    document.getElementById('settings-lang-ca').addEventListener('click', () => updateLanguage('ca'));
+    document.getElementById('settings-lang-en').addEventListener('click', () => updateLanguage('en'));
 
     // Restaurar estat música
     const storedMusic = localStorage.getItem('dejocoBlocksMusic');
     if (storedMusic !== null && musicCheckbox) {
         musicCheckbox.checked = storedMusic === 'true';
+    }
+    // Sync settings screen music checkbox
+    const settingsMusicCheckbox = document.getElementById('settings-music-enabled');
+    if (settingsMusicCheckbox) {
+        settingsMusicCheckbox.checked = musicCheckbox.checked;
     }
 
     // Restaurar volum i mute
@@ -258,12 +349,20 @@ document.addEventListener('DOMContentLoaded', () => {
         musicVolumeSlider.value = storedVol;
         if (bgMusic) bgMusic.volume = parseFloat(storedVol);
     }
+    // Sync settings screen volume slider
+    const settingsVolumeSlider = document.getElementById('settings-music-volume');
+    if (settingsVolumeSlider && musicVolumeSlider) {
+        settingsVolumeSlider.value = musicVolumeSlider.value;
+    }
+    
     const storedMuted = localStorage.getItem('dejocoBlocksMuted');
     if (storedMuted) {
         isMuted = storedMuted === 'true';
         if (bgMusic) bgMusic.muted = isMuted;
     }
     if (musicMuteBtn) musicMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
+    const settingsMuteBtn = document.getElementById('settings-music-mute');
+    if (settingsMuteBtn) settingsMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
 
     // Iniciar música si cal (després del primer gesture es reproduirà correctament)
     if (musicCheckbox && musicCheckbox.checked) {
@@ -278,6 +377,40 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pauseBtn) {
         pauseBtn.addEventListener('click', togglePause);
     }
+
+    // Settings button listener
+    document.getElementById('settings').addEventListener('click', showSettings);
+    document.getElementById('back-to-menu-settings').addEventListener('click', () => {
+        history.back();
+    });
+    
+    // Settings screen music controls
+    if (settingsMusicCheckbox) {
+        settingsMusicCheckbox.addEventListener('change', () => {
+            musicCheckbox.checked = settingsMusicCheckbox.checked;
+            toggleMusic();
+        });
+    }
+    if (settingsMuteBtn) {
+        settingsMuteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            if (bgMusic) bgMusic.muted = isMuted;
+            localStorage.setItem('dejocoBlocksMuted', isMuted ? 'true':'false');
+            settingsMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
+            if (musicMuteBtn) musicMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
+        });
+    }
+    if (settingsVolumeSlider) {
+        settingsVolumeSlider.addEventListener('input', () => {
+            const v = parseFloat(settingsVolumeSlider.value);
+            localStorage.setItem('dejocoBlocksVolume', v.toString());
+            if (bgMusic && !isMuted) bgMusic.volume = v;
+            if (musicVolumeSlider) musicVolumeSlider.value = v.toString();
+        });
+    }
+    
+    // Clear all data button
+    document.getElementById('clear-all-data').addEventListener('click', clearAllLocalData);
 
     // Handle browser back button to return to menu from any screen
     window.addEventListener('popstate', (event) => {
@@ -294,6 +427,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Check if we're on the instructions screen
         else if (document.getElementById('instructions-screen').style.display !== 'none') {
             document.getElementById('instructions-screen').style.display = 'none';
+            document.getElementById('menu').style.display = 'flex';
+            updateNewGameButton();
+        }
+        // Check if we're on the settings screen
+        else if (document.getElementById('settings-screen').style.display !== 'none') {
+            document.getElementById('settings-screen').style.display = 'none';
             document.getElementById('menu').style.display = 'flex';
             updateNewGameButton();
         }

@@ -10,6 +10,17 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
+    <!-- Initial Language Selection Screen -->
+    <div id="language-selection-screen" style="display: none;">
+        <h1>Dejoco Blocks</h1>
+        <p class="tagline">a Dejoco Arts game</p>
+        <h2 data-ca="Selecciona idioma" data-en="Select language">Selecciona idioma</h2>
+        <div class="language-selection-buttons">
+            <button id="select-lang-ca" class="lang-select-btn">Català</button>
+            <button id="select-lang-en" class="lang-select-btn">English</button>
+        </div>
+    </div>
+
     <div id="menu">
         <h1>Dejoco Blocks</h1>
         <p class="tagline">a Dejoco Arts game</p>
@@ -24,14 +35,49 @@
         <button id="new-game" data-ca="Nova Partida" data-en="New Game">Nova Partida</button>
         <button id="how-to-play" data-ca="Com Jugar" data-en="How to Play">Com Jugar</button>
         <button id="highscores" data-ca="Puntuacions" data-en="Highscores">Puntuacions</button>
+        <button id="settings" data-ca="Opcions" data-en="Settings">Opcions</button>
         <button id="credits" data-ca="Crèdits" data-en="Credits">Crèdits</button>
-        <button id="clear-local-scores" data-ca="Esborrar Puntuacions Locals" data-en="Clear Local Scores">Esborrar Puntuacions Locals</button>
         <div class="music-control">
             <input type="checkbox" id="music-enabled">
             <label for="music-enabled" data-ca="Música" data-en="Music">Música</label>
             <button id="music-mute" data-ca="Silenciar" data-en="Mute">Silenciar</button>
             <label for="music-volume" data-ca="Volum" data-en="Volume">Volum</label>
             <input type="range" id="music-volume" min="0" max="1" step="0.05" value="0.5" />
+        </div>
+    </div>
+    
+    <!-- Settings Screen -->
+    <div id="settings-screen" style="display: none;">
+        <h1 data-ca="Opcions" data-en="Settings">Opcions</h1>
+        <div class="settings-content">
+            <section class="settings-section">
+                <h3 data-ca="Idioma" data-en="Language">Idioma</h3>
+                <div class="language-selector">
+                    <button id="settings-lang-ca" class="lang-btn active">Català</button>
+                    <button id="settings-lang-en" class="lang-btn">English</button>
+                </div>
+            </section>
+            
+            <section class="settings-section">
+                <h3 data-ca="Música" data-en="Music">Música</h3>
+                <div class="music-control">
+                    <input type="checkbox" id="settings-music-enabled">
+                    <label for="settings-music-enabled" data-ca="Música" data-en="Music">Música</label>
+                </div>
+                <div class="music-control">
+                    <button id="settings-music-mute" data-ca="Silenciar" data-en="Mute">Silenciar</button>
+                    <label for="settings-music-volume" data-ca="Volum" data-en="Volume">Volum</label>
+                    <input type="range" id="settings-music-volume" min="0" max="1" step="0.05" value="0.5" />
+                </div>
+            </section>
+            
+            <section class="settings-section">
+                <h3 data-ca="Dades" data-en="Data">Dades</h3>
+                <button id="clear-all-data" class="danger-btn" data-ca="Esborrar Totes les Dades Locals" data-en="Clear All Local Data">Esborrar Totes les Dades Locals</button>
+            </section>
+        </div>
+        <div class="settings-actions">
+            <button id="back-to-menu-settings" data-ca="Tornar al Menú" data-en="Back to Menu">Tornar al Menú</button>
         </div>
     </div>
     <div id="game-container" style="display: none;">

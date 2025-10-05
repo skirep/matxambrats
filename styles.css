@@ -595,3 +595,138 @@ label {
         height: 50px;
     }
 }
+
+/* Language Selection Screen */
+#language-selection-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#language-selection-screen h1 {
+    margin-bottom: 0;
+}
+
+#language-selection-screen h2 {
+    color: #8bac0f;
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.language-selection-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 250px;
+}
+
+.lang-select-btn {
+    padding: 20px 40px;
+    font-size: 24px;
+    background-color: #306230;
+    border: 3px solid #0f380f;
+    color: #9bbc0f;
+    cursor: pointer;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    width: 100%;
+}
+
+.lang-select-btn:hover {
+    background-color: #8bac0f;
+    color: #0f380f;
+}
+
+/* Settings Screen */
+#settings-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
+    gap: 15px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#settings-screen h1 {
+    color: #9bbc0f;
+    margin-bottom: 10px;
+}
+
+.settings-content {
+    width: 100%;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 15px;
+    background-color: rgba(48, 98, 48, 0.3);
+    border: 3px solid #0f380f;
+    box-sizing: border-box;
+}
+
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.settings-section h3 {
+    color: #8bac0f;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.settings-section .language-selector {
+    margin-bottom: 0;
+}
+
+.settings-section .music-control {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.settings-actions {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.settings-actions button {
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #306230;
+    border: 3px solid #0f380f;
+    color: #9bbc0f;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
+
+.settings-actions button:hover {
+    background-color: #8bac0f;
+    color: #0f380f;
+}
+
+.danger-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #8b3030 !important;
+    border: 3px solid #0f380f;
+    color: #ff9b9b !important;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
+
+.danger-btn:hover {
+    background-color: #ac4f4f !important;
+    color: #ffcccc !important;
+}
