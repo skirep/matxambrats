@@ -16,15 +16,22 @@ A modern Tetris game built with HTML5, CSS3, and JavaScript. This game supports:
 
 The game is deployed at: [GitHub Pages URL]
 
-## Build Android APK
+## Build Mobile Apps
 
-This project can be compiled into an Android APK using Capacitor.
+This project can be compiled into Android APK and iOS IPA using Capacitor.
 
 ### Prerequisites
 
+#### For Android
 - Node.js 18 or higher
 - Java Development Kit (JDK) 17
 - Android SDK (automatically downloaded by Gradle)
+
+#### For iOS
+- macOS (required for iOS development)
+- Xcode 14.0 or higher
+- CocoaPods
+- Node.js 18 or higher
 
 ### Setup
 
@@ -38,12 +45,22 @@ npm install
 npm run build
 ```
 
-3. Sync with Android platform:
+3. Add mobile platforms:
 ```bash
-npx cap sync android
+# For Android
+npx cap add android
+
+# For iOS (macOS only)
+npx cap add ios
+cd ios/App && pod install && cd ../..
 ```
 
-### Build APK
+4. Sync with platforms:
+```bash
+npx cap sync
+```
+
+### Build Android APK
 
 #### Debug APK
 ```bash
@@ -63,11 +80,28 @@ The APK will be located at: `android/app/build/outputs/apk/release/app-release-u
 
 **Note:** For a production release, you'll need to sign the APK with a keystore.
 
+### Build iOS IPA
+
+1. Open the iOS project in Xcode:
+```bash
+npx cap open ios
+```
+
+2. In Xcode:
+   - Select target device: **Any iOS Device (arm64)**
+   - Go to **Product** → **Archive**
+   - Once archived, click **Distribute App**
+   - Follow the wizard to export or upload to App Store Connect
+
+**Note:** You need an Apple Developer account ($99/year) to distribute on the App Store.
+
 ### Automated Builds
 
 The project includes a GitHub Actions workflow that automatically builds the APK on every push to the main branch. The APK artifacts are available in the Actions tab of the repository.
 
-### Publishing to Google Play Store
+### Publishing to App Stores
+
+#### Google Play Store
 
 For complete instructions on preparing and publishing this app to Google Play Store, see:
 - **[PLAY_STORE_QUICK_START.md](PLAY_STORE_QUICK_START.md)** - Quick reference guide
@@ -80,13 +114,40 @@ These guides cover:
 - Store listing materials (screenshots, descriptions)
 - AAB/APK build and submission process
 
+#### Apple App Store
+
+For complete instructions on preparing and publishing this app to Apple App Store, see:
+- **[APP_STORE_QUICK_START.md](APP_STORE_QUICK_START.md)** - Quick reference guide
+- **[APP_STORE_GUIDE.md](APP_STORE_GUIDE.md)** - Comprehensive step-by-step guide
+
+These guides cover:
+- Apple Developer account setup
+- Certificate and provisioning profile creation
+- App icon and launch screen configuration
+- App Store Connect submission process
+- Screenshots and metadata requirements
+
 ## Development
 
 To modify the game:
 1. Edit `index.html`, `script.js`, or `styles.css`
 2. Run `npm run build` to copy files to the `www` directory
-3. Run `npx cap sync android` to update the Android project
-4. Build the APK as described above
+3. Run `npx cap sync` to update mobile projects
+4. Build for Android or iOS as described above
+
+### NPM Scripts
+
+```bash
+npm run build                    # Build web app
+npm run cap:add:android         # Add Android platform
+npm run cap:add:ios             # Add iOS platform
+npm run cap:sync                # Sync with all platforms
+npm run cap:open:android        # Open in Android Studio
+npm run cap:open:ios            # Open in Xcode
+npm run android:build           # Build debug APK
+npm run android:build:release   # Build release APK
+npm run ios:build               # Prepare for iOS build
+```
 
 ## License
 

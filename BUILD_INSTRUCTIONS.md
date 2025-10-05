@@ -1,44 +1,61 @@
-# Build Instructions for Android APK
+# Build Instructions for Mobile Apps
 
 ## Overview
 
-This document explains how to build the Dejoco Blocks Tetris game as an Android APK.
+This document explains how to build the Dejoco Blocks Tetris game as an Android APK or iOS IPA.
 
 ## What Was Added
 
-The following files and configurations were added to enable Android APK compilation:
+The following files and configurations were added to enable mobile app compilation:
 
 ### 1. Capacitor Configuration
-- **`package.json`**: Node.js package configuration with Capacitor dependencies and build scripts
-- **`capacitor.config.json`**: Capacitor configuration defining the app ID, name, and web directory
+- **`package.json`**: Node.js package configuration with Capacitor dependencies (Android & iOS) and build scripts
+- **`capacitor.config.json`**: Capacitor configuration defining the app ID, name, and web directory for both platforms
 - **`.gitignore`**: Git ignore file to exclude build artifacts, node_modules, and generated folders
 
 ### 2. GitHub Actions Workflow
-- **`.github/workflows/build-apk.yml`**: Automated workflow that builds the APK on every push to main branch
+- **`.github/workflows/build-apk.yml`**: Automated workflow that builds the Android APK on every push to main branch
 
 ### 3. Documentation
-- **`README.md`**: Updated with Android build instructions
+- **`README.md`**: Updated with Android and iOS build instructions
 - **`BUILD_INSTRUCTIONS.md`**: This file with detailed build information
+- **`PLAY_STORE_GUIDE.md`**: Complete guide for publishing to Google Play Store
+- **`PLAY_STORE_QUICK_START.md`**: Quick reference for Play Store publishing
+- **`APP_STORE_GUIDE.md`**: Complete guide for publishing to Apple App Store
+- **`APP_STORE_QUICK_START.md`**: Quick reference for App Store publishing
 
 ## How It Works
 
 ### Architecture
 
 1. **Web App**: The game is built with HTML, CSS, and JavaScript
-2. **Capacitor**: Wraps the web app in a native Android container
-3. **Gradle**: Builds the Android APK from the Capacitor project
+2. **Capacitor**: Wraps the web app in native mobile containers (Android & iOS)
+3. **Build Tools**: 
+   - **Gradle**: Builds the Android APK
+   - **Xcode**: Builds the iOS IPA
 
 ### Build Process
 
 1. **Copy files**: Web files are copied from the root to the `www/` directory
-2. **Sync**: Capacitor syncs the web files to the `android/` directory
-3. **Build**: Gradle compiles the Android project into an APK
+2. **Sync**: Capacitor syncs the web files to the `android/` and/or `ios/` directories
+3. **Build**: 
+   - **Android**: Gradle compiles the Android project into an APK
+   - **iOS**: Xcode compiles the iOS project into an IPA
 
 ## Building Locally
 
 ### Prerequisites
+
+#### For Android
 - Node.js 18 or higher
 - Java Development Kit (JDK) 17
+- Git
+
+#### For iOS
+- macOS (required)
+- Xcode 14.0 or higher
+- CocoaPods
+- Node.js 18 or higher
 - Git
 
 ### Steps
@@ -59,12 +76,24 @@ npm install
 npm run build
 ```
 
-4. Add Android platform (only needed once):
+4. Add mobile platforms:
+
+**For Android:**
 ```bash
 npx cap add android
 ```
 
-5. Build the debug APK:
+**For iOS (macOS only):**
+```bash
+npx cap add ios
+cd ios/App
+pod install
+cd ../..
+```
+
+5. Build the apps:
+
+**Android Debug APK:**
 ```bash
 cd android
 chmod +x gradlew
@@ -73,13 +102,27 @@ chmod +x gradlew
 
 The APK will be at: `android/app/build/outputs/apk/debug/app-debug.apk`
 
+**iOS (via Xcode):**
+```bash
+npx cap open ios
+```
+Then in Xcode: Product → Archive → Distribute App
+
 ### Alternative: Using NPM Scripts
 
 You can also use the convenience scripts defined in package.json:
 
 ```bash
+# Android
 npm run android:build          # Build debug APK
 npm run android:build:release  # Build release APK (unsigned)
+
+# iOS
+npm run ios:build              # Prepare for iOS build
+npm run cap:open:ios           # Open in Xcode
+
+# Both platforms
+npm run cap:sync               # Sync changes to all platforms
 ```
 
 ## GitHub Actions Automated Builds
@@ -135,18 +178,29 @@ Edit `capacitor.config.json`:
 {
   "appId": "com.yourcompany.yourapp",
   "appName": "Your App Name",
-  "webDir": "www"
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https"
+  }
 }
 ```
 
-### Adding App Icon
+### Adding App Icons
+
+**Android:**
 1. Create icons in various sizes (see Android icon guidelines)
-2. Place them in `android/app/src/main/res/` directories
+2. Place them in `android/app/src/main/res/mipmap-*` directories
 3. Update `android/app/src/main/AndroidManifest.xml`
 
-### Signing the Release APK
-For production releases, you need to sign the APK:
+**iOS:**
+1. Create an App Icon Set (1024x1024 base image)
+2. Use [App Icon Generator](https://www.appicon.co/) to generate all sizes
+3. Replace contents of `ios/App/App/Assets.xcassets/AppIcon.appiconset/`
 
+### Signing for Production
+
+**Android APK/AAB:**
 1. Create a keystore:
 ```bash
 keytool -genkey -v -keystore my-release-key.keystore -alias my-key-alias -keyalg RSA -keysize 2048 -validity 10000
@@ -158,24 +212,71 @@ keytool -genkey -v -keystore my-release-key.keystore -alias my-key-alias -keyalg
 ./gradlew assembleRelease
 ```
 
+See `PLAY_STORE_GUIDE.md` for complete instructions.
+
+**iOS IPA:**
+1. Create an Apple Developer account ($99/year)
+2. Create certificates and provisioning profiles
+3. Configure signing in Xcode (Signing & Capabilities)
+4. Archive and distribute through Xcode
+
+See `APP_STORE_GUIDE.md` for complete instructions.
+
 ## Troubleshooting
 
-### Build Fails with "SDK not found"
+### Android Issues
+
+**Build Fails with "SDK not found"**
 - Ensure Android SDK is installed
 - Set ANDROID_HOME environment variable
 
-### Gradle Errors
+**Gradle Errors**
 - Try cleaning the build:
 ```bash
 cd android
 ./gradlew clean
 ```
 
-### Capacitor Sync Issues
+**Capacitor Sync Issues**
 - Delete the android folder and regenerate:
 ```bash
 rm -rf android
 npx cap add android
+```
+
+### iOS Issues
+
+**Xcode not found**
+- Ensure Xcode is installed from Mac App Store
+- Run: `xcode-select --install`
+
+**CocoaPods Errors**
+- Update CocoaPods:
+```bash
+sudo gem install cocoapods
+pod setup
+```
+
+**Pod Install Fails**
+- Clean and reinstall:
+```bash
+cd ios/App
+pod deintegrate
+pod install
+cd ../..
+```
+
+**Signing Errors**
+- Ensure you have an Apple Developer account
+- Check Bundle Identifier matches your App ID
+- Enable "Automatically manage signing" in Xcode
+
+**iOS Platform Issues**
+- Delete and regenerate:
+```bash
+rm -rf ios
+npx cap add ios
+cd ios/App && pod install && cd ../..
 ```
 
 ## Support
@@ -183,4 +284,5 @@ npx cap add android
 For issues specific to:
 - **Capacitor**: https://capacitorjs.com/docs
 - **Android Build**: https://developer.android.com/studio/build
+- **iOS Build**: https://capacitorjs.com/docs/ios
 - **This Project**: Open an issue on GitHub

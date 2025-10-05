@@ -8,17 +8,21 @@
     "copy": "mkdir -p www && cp index.html script.js styles.css tetris.mp3 tetris.mid www/",
     "cap:init": "cap init",
     "cap:add:android": "cap add android",
+    "cap:add:ios": "cap add ios",
     "cap:sync": "cap sync",
     "cap:open:android": "cap open android",
+    "cap:open:ios": "cap open ios",
     "android:build": "npm run build && npm run cap:sync && cd android && ./gradlew assembleDebug",
-    "android:build:release": "npm run build && npm run cap:sync && cd android && ./gradlew assembleRelease"
+    "android:build:release": "npm run build && npm run cap:sync && cd android && ./gradlew assembleRelease",
+    "ios:build": "npm run build && npm run cap:sync"
   },
   "keywords": [
     "tetris",
     "game",
     "blocks",
     "capacitor",
-    "android"
+    "android",
+    "ios"
   ],
   "author": "Dejoco Arts",
   "license": "ISC",
@@ -27,6 +31,7 @@
   },
   "dependencies": {
     "@capacitor/android": "^5.5.1",
-    "@capacitor/core": "^5.5.1"
+    "@capacitor/core": "^5.5.1",
+    "@capacitor/ios": "^5.5.1"
   }
 }
