@@ -1,0 +1,82 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Add iOS platform
+        run: npx cap add ios
+
+      - name: Sync Capacitor
+        run: npx cap sync ios
+
+      - name: Install CocoaPods dependencies
+        run: |
+          cd ios/App
+          pod install
+
+      - name: Build iOS app for simulator
+        run: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -derivedDataPath $PWD/build \
+            build
+
+      - name: Create simulator IPA
+        run: |
+          cd ios/App/build/Build/Products/Debug-iphonesimulator
+          mkdir -p Payload
+          cp -r App.app Payload/
+          zip -r dejoco-blocks-simulator.ipa Payload
+          mkdir -p $GITHUB_WORKSPACE/output
+          mv dejoco-blocks-simulator.ipa $GITHUB_WORKSPACE/output/
+
+      - name: Upload simulator IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dejoco-blocks-simulator.ipa
+          path: output/*.ipa
+          retention-days: 30
+
+      - name: Build summary
+        run: |
+          echo "## iOS Build Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Simulator Build" >> $GITHUB_STEP_SUMMARY
+          echo "- A simulator IPA has been created for testing on iOS Simulator" >> $GITHUB_STEP_SUMMARY
+          echo "- Download the artifact to test on macOS with Xcode Simulator" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Note on Device Builds" >> $GITHUB_STEP_SUMMARY
+          echo "To create an IPA for physical iOS devices, you need:" >> $GITHUB_STEP_SUMMARY
+          echo "- An Apple Developer account" >> $GITHUB_STEP_SUMMARY
+          echo "- Code signing certificates and provisioning profiles" >> $GITHUB_STEP_SUMMARY
+          echo "- Configure these as GitHub secrets for automated signing" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "See BUILD_INSTRUCTIONS.md and APP_STORE_GUIDE.md for more details." >> $GITHUB_STEP_SUMMARY
