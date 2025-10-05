@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dejoco Blocks</title>
+    <title>Matxambrats</title>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -12,9 +12,13 @@
 <body>
     <!-- Initial Language Selection Screen -->
     <div id="language-selection-screen" style="display: none;">
-        <h1>Dejoco Blocks</h1>
-        <p class="tagline">a Dejoco Arts game</p>
+        <h1>Matxambrats</h1>
+        <p class="tagline">v0.5</p>
         <h2 data-ca="Selecciona idioma" data-en="Select language">Selecciona idioma</h2>
+        <div class="player-name-wrapper">
+            <label for="player-name-lang" data-ca="Nom" data-en="Name">Nom</label>
+            <input id="player-name-lang" type="text" maxlength="12" placeholder="Player" />
+        </div>
         <div class="language-selection-buttons">
             <button id="select-lang-ca" class="lang-select-btn">Català</button>
             <button id="select-lang-en" class="lang-select-btn">English</button>
@@ -22,12 +26,8 @@
     </div>
 
     <div id="menu">
-        <h1>Dejoco Blocks</h1>
-        <p class="tagline">a Dejoco Arts game</p>
-        <div class="player-name-wrapper">
-            <label for="player-name" data-ca="Nom" data-en="Name">Nom</label>
-            <input id="player-name" type="text" maxlength="12" placeholder="Player" />
-        </div>
+        <h1>Matxambrats</h1>
+        <p class="tagline">v0.5</p>
         <button id="new-game" data-ca="Nova Partida" data-en="New Game">Nova Partida</button>
         <button id="how-to-play" data-ca="Com Jugar" data-en="How to Play">Com Jugar</button>
         <button id="highscores" data-ca="Puntuacions" data-en="Highscores">Puntuacions</button>
@@ -39,6 +39,14 @@
     <div id="settings-screen" style="display: none;">
         <h1 data-ca="Opcions" data-en="Settings">Opcions</h1>
         <div class="settings-content">
+            <section class="settings-section">
+                <h3 data-ca="Jugador" data-en="Player">Jugador</h3>
+                <div class="player-name-wrapper">
+                    <label for="player-name-settings" data-ca="Nom" data-en="Name">Nom</label>
+                    <input id="player-name-settings" type="text" maxlength="12" placeholder="Player" />
+                </div>
+            </section>
+            
             <section class="settings-section">
                 <h3 data-ca="Idioma" data-en="Language">Idioma</h3>
                 <div class="language-selector">
