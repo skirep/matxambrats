@@ -131,8 +131,8 @@ const board = Array.from({ length: boardHeight }, () => Array(boardWidth).fill(0
 const scoreElement = document.getElementById('score');
 const levelElement = document.getElementById('level');
 const clearLocalBtn = document.getElementById('clear-local-scores');
-const musicMuteBtn = document.getElementById('music-mute');
-const musicVolumeSlider = document.getElementById('music-volume');
+const musicMuteBtn = document.getElementById('settings-music-mute');
+const musicVolumeSlider = document.getElementById('settings-music-volume');
 let isMuted = false;
 let baseDropInterval = 400;
 
@@ -240,24 +240,16 @@ function updateLanguage(lang) {
         }
     });
     
-    // Actualitzar classe activa dels botons d'idioma (menu principal)
+    // Actualitzar classe activa dels botons d'idioma (settings)
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    const mainLangBtn = document.getElementById('lang-' + lang);
-    if (mainLangBtn) mainLangBtn.classList.add('active');
-    
-    // Actualitzar classe activa dels botons d'idioma (settings)
     const settingsLangBtn = document.getElementById('settings-lang-' + lang);
     if (settingsLangBtn) settingsLangBtn.classList.add('active');
 
     // Actualitzar text botó mute segons estat
     if (musicMuteBtn) {
         musicMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
-    }
-    const settingsMuteBtn = document.getElementById('settings-music-mute');
-    if (settingsMuteBtn) {
-        settingsMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
     }
 }
 
@@ -266,16 +258,6 @@ function showSettings() {
     document.getElementById('menu').style.display = 'none';
     document.getElementById('settings-screen').style.display = 'flex';
     history.pushState({ page: 'settings' }, '', '');
-    
-    // Sync settings with current values
-    const settingsMusicCheckbox = document.getElementById('settings-music-enabled');
-    if (settingsMusicCheckbox && musicCheckbox) {
-        settingsMusicCheckbox.checked = musicCheckbox.checked;
-    }
-    const settingsVolumeSlider = document.getElementById('settings-music-volume');
-    if (settingsVolumeSlider && musicVolumeSlider) {
-        settingsVolumeSlider.value = musicVolumeSlider.value;
-    }
 }
 
 // Function to clear all local data
@@ -325,9 +307,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('menu').style.display = 'flex';
     }
     
-    document.getElementById('lang-ca').addEventListener('click', () => updateLanguage('ca'));
-    document.getElementById('lang-en').addEventListener('click', () => updateLanguage('en'));
-    
     // Settings screen language buttons
     document.getElementById('settings-lang-ca').addEventListener('click', () => updateLanguage('ca'));
     document.getElementById('settings-lang-en').addEventListener('click', () => updateLanguage('en'));
@@ -337,22 +316,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storedMusic !== null && musicCheckbox) {
         musicCheckbox.checked = storedMusic === 'true';
     }
-    // Sync settings screen music checkbox
-    const settingsMusicCheckbox = document.getElementById('settings-music-enabled');
-    if (settingsMusicCheckbox) {
-        settingsMusicCheckbox.checked = musicCheckbox.checked;
-    }
 
     // Restaurar volum i mute
     const storedVol = localStorage.getItem('dejocoBlocksVolume');
     if (storedVol && musicVolumeSlider) {
         musicVolumeSlider.value = storedVol;
         if (bgMusic) bgMusic.volume = parseFloat(storedVol);
-    }
-    // Sync settings screen volume slider
-    const settingsVolumeSlider = document.getElementById('settings-music-volume');
-    if (settingsVolumeSlider && musicVolumeSlider) {
-        settingsVolumeSlider.value = musicVolumeSlider.value;
     }
     
     const storedMuted = localStorage.getItem('dejocoBlocksMuted');
@@ -361,8 +330,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (bgMusic) bgMusic.muted = isMuted;
     }
     if (musicMuteBtn) musicMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
-    const settingsMuteBtn = document.getElementById('settings-music-mute');
-    if (settingsMuteBtn) settingsMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
 
     // Iniciar música si cal (després del primer gesture es reproduirà correctament)
     if (musicCheckbox && musicCheckbox.checked) {
@@ -385,27 +352,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Settings screen music controls
-    if (settingsMusicCheckbox) {
-        settingsMusicCheckbox.addEventListener('change', () => {
-            musicCheckbox.checked = settingsMusicCheckbox.checked;
+    if (musicCheckbox) {
+        musicCheckbox.addEventListener('change', () => {
             toggleMusic();
         });
     }
-    if (settingsMuteBtn) {
-        settingsMuteBtn.addEventListener('click', () => {
+    if (musicMuteBtn) {
+        musicMuteBtn.addEventListener('click', () => {
             isMuted = !isMuted;
             if (bgMusic) bgMusic.muted = isMuted;
             localStorage.setItem('dejocoBlocksMuted', isMuted ? 'true':'false');
-            settingsMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
-            if (musicMuteBtn) musicMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
+            musicMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
         });
     }
-    if (settingsVolumeSlider) {
-        settingsVolumeSlider.addEventListener('input', () => {
-            const v = parseFloat(settingsVolumeSlider.value);
+    if (musicVolumeSlider) {
+        musicVolumeSlider.addEventListener('input', () => {
+            const v = parseFloat(musicVolumeSlider.value);
             localStorage.setItem('dejocoBlocksVolume', v.toString());
             if (bgMusic && !isMuted) bgMusic.volume = v;
-            if (musicVolumeSlider) musicVolumeSlider.value = v.toString();
         });
     }
     
@@ -1036,7 +1000,7 @@ function showInstructions() {
 }
 
 // Music control logic
-const musicCheckbox = document.getElementById('music-enabled');
+const musicCheckbox = document.getElementById('settings-music-enabled');
 const bgMusic = document.getElementById('bg-music');
 
 function toggleMusic(auto = false) {
@@ -1051,26 +1015,6 @@ function toggleMusic(auto = false) {
         bgMusic.pause();
         bgMusic.currentTime = 0;
     }
-}
-
-if (musicCheckbox) {
-    musicCheckbox.addEventListener('change', () => toggleMusic());
-}
-
-if (musicMuteBtn) {
-    musicMuteBtn.addEventListener('click', () => {
-        isMuted = !isMuted;
-        if (bgMusic) bgMusic.muted = isMuted;
-        localStorage.setItem('dejocoBlocksMuted', isMuted ? 'true':'false');
-        musicMuteBtn.textContent = isMuted ? translations.unmute[currentLanguage] : translations.mute[currentLanguage];
-    });
-}
-if (musicVolumeSlider) {
-    musicVolumeSlider.addEventListener('input', () => {
-        const v = parseFloat(musicVolumeSlider.value);
-        localStorage.setItem('dejocoBlocksVolume', v.toString());
-        if (bgMusic && !isMuted) bgMusic.volume = v;
-    });
 }
 
 // Clear local scores
