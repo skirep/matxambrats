@@ -13,8 +13,9 @@ The following files and configurations were added to enable mobile app compilati
 - **`capacitor.config.json`**: Capacitor configuration defining the app ID, name, and web directory for both platforms
 - **`.gitignore`**: Git ignore file to exclude build artifacts, node_modules, and generated folders
 
-### 2. GitHub Actions Workflow
+### 2. GitHub Actions Workflows
 - **`.github/workflows/build-apk.yml`**: Automated workflow that builds the Android APK on every push to main branch
+- **`.github/workflows/build-ipa.yml`**: Automated workflow that builds the iOS IPA (simulator) on every push to main branch
 
 ### 3. Documentation
 - **`README.md`**: Updated with Android and iOS build instructions
@@ -127,25 +128,50 @@ npm run cap:sync               # Sync changes to all platforms
 
 ## GitHub Actions Automated Builds
 
-Every push to the main branch automatically triggers the build workflow:
+Every push to the main branch automatically triggers build workflows for both Android and iOS.
 
-1. The workflow installs dependencies
+### Android APK Workflow
+
+The Android workflow:
+1. Installs dependencies
 2. Builds the web app
 3. Syncs with Capacitor
 4. Builds the debug APK
 5. Uploads the APK as an artifact
 
-### Accessing Built APKs
+### iOS IPA Workflow
 
+The iOS workflow:
+1. Installs dependencies on a macOS runner
+2. Builds the web app
+3. Syncs with Capacitor
+4. Installs CocoaPods dependencies
+5. Builds the iOS app for simulator
+6. Creates a simulator IPA
+7. Uploads the IPA as an artifact
+
+**Note:** The iOS workflow builds for the iOS Simulator (not physical devices) because building for devices requires code signing certificates and provisioning profiles from an Apple Developer account. The simulator IPA can be used for testing on macOS with Xcode Simulator.
+
+### Accessing Built Artifacts
+
+**For Android APKs:**
 1. Go to the "Actions" tab in the GitHub repository
-2. Click on the latest workflow run
+2. Click on the latest "Build Android APK" workflow run
 3. Download the APK from the "Artifacts" section
 4. The APK is retained for 30 days
 
+**For iOS IPAs:**
+1. Go to the "Actions" tab in the GitHub repository
+2. Click on the latest "Build iOS IPA" workflow run
+3. Download the simulator IPA from the "Artifacts" section
+4. The IPA is retained for 30 days
+5. You can install it on iOS Simulator in Xcode on macOS
+
 ### Manual Workflow Trigger
 
-You can also manually trigger a build that includes both debug and release APKs:
+You can manually trigger builds for both platforms:
 
+**Android:**
 1. Go to the "Actions" tab
 2. Select "Build Android APK" workflow
 3. Click "Run workflow"
@@ -154,21 +180,55 @@ You can also manually trigger a build that includes both debug and release APKs:
 
 This will build both debug and release versions.
 
-## Installing the APK on Android
+**iOS:**
+1. Go to the "Actions" tab
+2. Select "Build iOS IPA" workflow
+3. Click "Run workflow"
+4. Choose the branch (usually main)
+5. Click "Run workflow"
 
-### Method 1: Direct Installation
+This will build the simulator IPA.
+
+## Installing the Builds
+
+### Android APK on Android Devices
+
+#### Method 1: Direct Installation
 1. Download the APK to your Android device
 2. Open the APK file
 3. Allow installation from unknown sources if prompted
 4. Install the app
 
-### Method 2: ADB Installation
+#### Method 2: ADB Installation
 1. Enable USB debugging on your Android device
 2. Connect your device to your computer
 3. Run:
 ```bash
 adb install android/app/build/outputs/apk/debug/app-debug.apk
 ```
+
+### iOS IPA on iOS Simulator
+
+The IPA built by GitHub Actions is for the iOS Simulator only. To install it:
+
+1. Download the simulator IPA artifact from GitHub Actions
+2. Extract the IPA file (it's a ZIP archive):
+```bash
+unzip dejoco-blocks-simulator.ipa
+```
+3. Open Xcode and launch iOS Simulator
+4. Drag and drop the `Payload/App.app` to the simulator
+5. Alternatively, use command line:
+```bash
+xcrun simctl install booted Payload/App.app
+```
+
+**For Physical iOS Devices:**
+To build an IPA for physical devices, you need to:
+1. Have an Apple Developer account
+2. Set up code signing certificates and provisioning profiles
+3. Build locally using Xcode with proper signing configuration
+4. See `APP_STORE_GUIDE.md` for detailed instructions
 
 ## Customization
 

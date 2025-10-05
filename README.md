@@ -97,7 +97,14 @@ npx cap open ios
 
 ### Automated Builds
 
-The project includes a GitHub Actions workflow that automatically builds the APK on every push to the main branch. The APK artifacts are available in the Actions tab of the repository.
+The project includes GitHub Actions workflows that automatically build both Android APK and iOS IPA on every push to the main branch:
+
+- **Android APK**: Builds a debug APK that can be installed on Android devices
+- **iOS IPA**: Builds a simulator IPA that can be tested on iOS Simulator (macOS only)
+
+The build artifacts are available in the Actions tab of the repository and are retained for 30 days.
+
+**Note:** The iOS workflow builds for the iOS Simulator. To build for physical iOS devices, you need an Apple Developer account and code signing certificates. See `APP_STORE_GUIDE.md` for details.
 
 ### Publishing to App Stores
 
