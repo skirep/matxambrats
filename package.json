@@ -1,7 +1,7 @@
 {
-  "name": "dejoco-blocks",
-  "version": "1.0.0",
-  "description": "Dejoco Blocks - A Tetris game by Dejoco Arts",
+  "name": "matxambrats",
+  "version": "0.5.0",
+  "description": "Matxambrats - A Tetris game",
   "main": "index.html",
   "scripts": {
     "build": "npm run copy",

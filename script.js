@@ -192,8 +192,8 @@ const translations = {
         en: 'No scores yet!'
     },
     credits: {
-        ca: 'Dejoco Blocks\nDesenvolupat per un assistent d\'IA',
-        en: 'Dejoco Blocks\nDeveloped by an AI assistant'
+        ca: 'Matxambrats v0.5\nDesenvolupat per un assistent d\'IA',
+        en: 'Matxambrats v0.5\nDeveloped by an AI assistant'
     },
     clearLocal: { ca: 'Esborrat puntuacions locals', en: 'Local scores cleared' },
     confirmExit: { ca: 'Vols sortir de la partida en curs?', en: 'Leave the current game?' },
@@ -883,15 +883,57 @@ async function fetchRemoteHighscores(limit = 10) {
 }
 // --- Fi Firebase ---
 
-// Guardar nom jugador a localStorage
-const playerNameInput = document.getElementById('player-name');
-if (playerNameInput) {
+// Guardar nom jugador a localStorage - now handling multiple inputs
+const playerNameLangInput = document.getElementById('player-name-lang');
+const playerNameSettingsInput = document.getElementById('player-name-settings');
+
+function savePlayerName(name) {
+    localStorage.setItem('dejocoBlocksPlayerName', name.trim());
+}
+
+function loadPlayerName() {
     const storedName = localStorage.getItem('dejocoBlocksPlayerName');
-    if (storedName) playerNameInput.value = storedName;
-    playerNameInput.addEventListener('input', () => {
-        localStorage.setItem('dejocoBlocksPlayerName', playerNameInput.value.trim());
+    if (storedName) {
+        if (playerNameLangInput) playerNameLangInput.value = storedName;
+        if (playerNameSettingsInput) playerNameSettingsInput.value = storedName;
+    }
+}
+
+function getPlayerName() {
+    // Try to get from settings first, then language screen, then use default
+    let name = '';
+    if (playerNameSettingsInput && playerNameSettingsInput.value.trim()) {
+        name = playerNameSettingsInput.value.trim();
+    } else if (playerNameLangInput && playerNameLangInput.value.trim()) {
+        name = playerNameLangInput.value.trim();
+    } else {
+        name = localStorage.getItem('dejocoBlocksPlayerName') || 'Player';
+    }
+    return name;
+}
+
+if (playerNameLangInput) {
+    playerNameLangInput.addEventListener('input', () => {
+        savePlayerName(playerNameLangInput.value);
+        // Sync with settings input if it exists
+        if (playerNameSettingsInput) {
+            playerNameSettingsInput.value = playerNameLangInput.value;
+        }
     });
 }
+
+if (playerNameSettingsInput) {
+    playerNameSettingsInput.addEventListener('input', () => {
+        savePlayerName(playerNameSettingsInput.value);
+        // Sync with language input if it exists
+        if (playerNameLangInput) {
+            playerNameLangInput.value = playerNameSettingsInput.value;
+        }
+    });
+}
+
+// Load player name on initialization
+loadPlayerName();
 
 function renderHighscoreList(entries, isRemote) {
     const list = document.getElementById('highscores-list');
@@ -976,7 +1018,7 @@ function saveHighscore() {
     highscores.push({ score: score, time: elapsedTime });
     localStorage.setItem('tetrisHighscores', JSON.stringify(highscores));
     // Enviar també a Firestore
-    const playerName = sanitizePlayerName((playerNameInput && playerNameInput.value.trim()) || 'Player');
+    const playerName = sanitizePlayerName(getPlayerName());
     saveRemoteHighscore(playerName, score, elapsedTime);
 }
 
