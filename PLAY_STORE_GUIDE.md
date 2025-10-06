@@ -66,7 +66,20 @@ npm run build
 npx cap add android
 ```
 
-### 4. Configurar AndroidManifest.xml
+### 4. Configurar Firebase per al Mode Multijugador
+
+**Important:** Per a que el mode multijugador (Deathmatch Online) funcioni, necessites configurar Firebase Realtime Database.
+
+Segueix les instruccions a:
+- **Guia Ràpida**: [FIREBASE_QUICK_START.md](FIREBASE_QUICK_START.md)
+- **Guia Completa**: [FIREBASE_SETUP.md](FIREBASE_SETUP.md)
+
+Resum:
+1. Accedeix a [Firebase Console](https://console.firebase.google.com/project/dejoco-blocks/database)
+2. Publica les regles de seguretat del fitxer `database.rules.json`
+3. Verifica que el mode multijugador funciona abans de publicar l'app
+
+### 5. Configurar AndroidManifest.xml
 
 Edita el fitxer `android/app/src/main/AndroidManifest.xml` i assegura't que conté:
 
@@ -107,7 +120,7 @@ Edita el fitxer `android/app/src/main/AndroidManifest.xml` i assegura't que cont
 
 **Nota:** `android:screenOrientation="portrait"` fixa l'orientació a vertical. Elimina aquesta línia si vols suportar orientació horitzontal.
 
-### 5. Configurar build.gradle (nivell app)
+### 6. Configurar build.gradle (nivell app)
 
 Edita `android/app/build.gradle`:
 
