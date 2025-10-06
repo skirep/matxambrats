@@ -48,11 +48,15 @@ const firebaseConfig = {
     apiKey: "AIzaSyAKe5KSEh71w1ik2ynRYBEyd9jWOY-Dl5U",
     authDomain: "dejoco-blocks.firebaseapp.com",
     projectId: "dejoco-blocks",
-    databaseURL: "https://dejoco-blocks-default-rtdb.firebaseio.com"
+    databaseURL: "https://dejoco-blocks-default-rtdb.europe-west1.firebasedatabase.app/"
 };
 ```
 
-Assegura't que el `databaseURL` coincideix amb l'URL de la teva Realtime Database.
+**Important**: Assegura't que el `databaseURL` coincideix amb la regió de la teva Realtime Database:
+- **US**: `https://dejoco-blocks-default-rtdb.firebaseio.com`
+- **Europa (europe-west1)**: `https://dejoco-blocks-default-rtdb.europe-west1.firebasedatabase.app/`
+
+Pots trobar l'URL exacta a la consola de Firebase, a la pàgina de Realtime Database.
 
 ## Explicació de les Regles
 
@@ -159,8 +163,11 @@ Per verificar que tot funciona:
 
 ### Error: "Permission denied"
 
-- Verifica que has publicat les regles de seguretat
-- Comprova que el `databaseURL` és correcte
+- Verifica que has publicat les regles de seguretat a la consola de Firebase
+- Comprova que el `databaseURL` en `script.js` coincideix amb la regió de la teva base de dades:
+  - Si la base de dades està a **US**: `https://dejoco-blocks-default-rtdb.firebaseio.com`
+  - Si la base de dades està a **Europa (europe-west1)**: `https://dejoco-blocks-default-rtdb.europe-west1.firebasedatabase.app/`
+- Assegura't que les regles inclouen el node `rooms` amb permisos de lectura i escriptura
 
 ### Els jugadors no es connecten
 

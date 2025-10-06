@@ -10,6 +10,9 @@ El mode **Deathmatch Online** no funciona perquè falten les regles de seguretat
 
 Accedeix a: https://console.firebase.google.com/project/dejoco-blocks/database/dejoco-blocks-default-rtdb/rules
 
+**Important**: Si la teva base de dades està a Europa (europe-west1), l'URL serà:
+`https://dejoco-blocks-default-rtdb.europe-west1.firebasedatabase.app/`
+
 ### 2. Configura les Regles
 
 A la pestanya **Rules**, enganxa aquest codi:
@@ -51,6 +54,8 @@ Per més detalls i opcions de seguretat avançades, consulta **[FIREBASE_SETUP.m
 ## Ajuda
 
 Si tens problemes:
-- Verifica que la URL de la base de dades és: `https://dejoco-blocks-default-rtdb.firebaseio.com`
+- Verifica que la URL de la base de dades coincideix amb la regió de la teva base de dades:
+  - **US**: `https://dejoco-blocks-default-rtdb.firebaseio.com`
+  - **Europa (europe-west1)**: `https://dejoco-blocks-default-rtdb.europe-west1.firebasedatabase.app/`
 - Comprova la consola del navegador per errors
 - Assegura't que has publicat les regles (botó **Publish**)
