@@ -184,6 +184,7 @@ let isAnimating = false;
 let animationFrame = 0;
 let isGameActive = false;
 let isPaused = false;
+let pendingGarbageLines = 0;
 
 let currentLanguage = 'ca';
 
@@ -721,6 +722,13 @@ function checkRows() {
                 }
                 
                 isAnimating = false;
+                
+                // Process any pending garbage lines from opponent
+                if (pendingGarbageLines > 0) {
+                    addGarbageLines(pendingGarbageLines);
+                    pendingGarbageLines = 0;
+                }
+                
                 createPiece();
             });
         };
@@ -851,6 +859,7 @@ function startGame() {
     isAnimating = false;
     isGameActive = true;
     isPaused = false;
+    pendingGarbageLines = 0;
     lastTime = 0;
     dropCounter = 0;
     document.getElementById('timer').textContent = '00:00';
@@ -1120,9 +1129,14 @@ function handleOpponentLineCleared(opponentLines) {
             opponentLinesElement.innerHTML = opponentLines + ' <span>' + linesText + '</span>';
         }
         
-        // Add garbage lines to player's board
-        if (isGameActive && !isAnimating) {
-            addGarbageLines(linesClearedNow);
+        // Queue garbage lines to be added to player's board
+        if (isGameActive) {
+            if (!isAnimating) {
+                addGarbageLines(linesClearedNow);
+            } else {
+                // Queue the garbage lines if currently animating
+                pendingGarbageLines += linesClearedNow;
+            }
         }
         
         // Show notification
@@ -1193,6 +1207,7 @@ function cleanupMultiplayer() {
     playerRole = null;
     opponentName = '';
     lastOpponentLines = 0;
+    pendingGarbageLines = 0;
 }
 
 // --- Fi Firebase ---
