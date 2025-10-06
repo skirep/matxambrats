@@ -4,7 +4,15 @@
 
 El mode multijugador (Deathmatch Online) utilitza Firebase Realtime Database per sincronitzar les partides entre jugadors. Per a que funcioni correctament, necessites configurar les regles de seguretat de la base de dades.
 
-## Configuració Pas a Pas
+## Opcions de Configuració
+
+Tens dues opcions per configurar les regles de Firebase:
+
+1. **Configuració Manual** (explicada a continuació) - Còpia manual de regles a la consola
+2. **Desplegament Automàtic** - Utilitza Firebase CLI per desplegar automàticament
+   - Consulta **[FIREBASE_CLI_DEPLOYMENT.md](FIREBASE_CLI_DEPLOYMENT.md)** per instruccions
+
+## Configuració Pas a Pas (Manual)
 
 ### 1. Accedeix a la Consola de Firebase
 

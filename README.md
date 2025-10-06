@@ -19,7 +19,11 @@ The game is deployed at: [GitHub Pages URL]
 
 ## Firebase Configuration for Multiplayer
 
-To enable the multiplayer mode (Online Deathmatch), you need to configure Firebase Realtime Database security rules. See **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** for complete setup instructions.
+To enable the multiplayer mode (Online Deathmatch), you need to configure Firebase Realtime Database security rules. Choose one of these options:
+
+- **[FIREBASE_QUICK_START.md](FIREBASE_QUICK_START.md)** - Quick manual setup (5 minutes)
+- **[FIREBASE_CLI_DEPLOYMENT.md](FIREBASE_CLI_DEPLOYMENT.md)** - Automatic deployment with Firebase CLI
+- **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** - Complete setup guide with security options
 
 ## Build Mobile Apps
 

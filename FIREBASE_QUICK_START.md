@@ -47,6 +47,12 @@ Fes clic al botó **Publish** (Publicar)
 - Indexen les sales per estat (`waiting`, `playing`) per trobar-les ràpidament
 - Permeten la sincronització en temps real entre jugadors
 
+## Desplegament Automàtic (Alternatiu)
+
+Si prefereixes no copiar les regles manualment, pots utilitzar Firebase CLI per desplegar-les automàticament:
+
+**Consulta [FIREBASE_CLI_DEPLOYMENT.md](FIREBASE_CLI_DEPLOYMENT.md)** per instruccions detallades.
+
 ## Documentació Completa
 
 Per més detalls i opcions de seguretat avançades, consulta **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)**
