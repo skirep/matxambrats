@@ -729,6 +729,24 @@ function checkRows() {
     }
 }
 
+function addGarbageLines(lineCount) {
+    // Add garbage lines to the bottom of the board
+    // This is called when opponent clears lines in multiplayer mode
+    
+    // Remove the top 'lineCount' rows from the board
+    for (let i = 0; i < lineCount; i++) {
+        board.shift();
+    }
+    
+    // Add new filled lines at the bottom with one random gap
+    for (let i = 0; i < lineCount; i++) {
+        const newRow = Array(boardWidth).fill(1); // Fill with blocks (value 1)
+        const gapPosition = Math.floor(Math.random() * boardWidth); // Random gap position
+        newRow[gapPosition] = 0; // Create a gap
+        board.push(newRow);
+    }
+}
+
 function updateLevel() {
     const level = Math.floor(linesCleared / 10) + 1;
     if (levelElement) levelElement.textContent = level;
@@ -1100,6 +1118,11 @@ function handleOpponentLineCleared(opponentLines) {
             const linesText = currentLanguage === 'ca' ? 'línies' : 
                              currentLanguage === 'es' ? 'líneas' : 'lines';
             opponentLinesElement.innerHTML = opponentLines + ' <span>' + linesText + '</span>';
+        }
+        
+        // Add garbage lines to player's board
+        if (isGameActive && !isAnimating) {
+            addGarbageLines(linesClearedNow);
         }
         
         // Show notification
