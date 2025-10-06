@@ -185,31 +185,34 @@ let currentLanguage = 'ca';
 const translations = {
     gameOver: {
         ca: 'Fi del joc! La teva puntuació: ',
-        en: 'Game Over! Your score: '
+        en: 'Game Over! Your score: ',
+        es: '¡Fin del juego! Tu puntuación: '
     },
     noScores: {
         ca: 'Encara no hi ha puntuacions!',
-        en: 'No scores yet!'
+        en: 'No scores yet!',
+        es: '¡Aún no hay puntuaciones!'
     },
     credits: {
         ca: 'Matxambrats v0.5\nDesenvolupat per un assistent d\'IA',
-        en: 'Matxambrats v0.5\nDeveloped by an AI assistant'
+        en: 'Matxambrats v0.5\nDeveloped by an AI assistant',
+        es: 'Matxambrats v0.5\nDesarrollado por un asistente de IA'
     },
-    clearLocal: { ca: 'Esborrat puntuacions locals', en: 'Local scores cleared' },
-    confirmExit: { ca: 'Vols sortir de la partida en curs?', en: 'Leave the current game?' },
-    nameLabel: { ca: 'Nom', en: 'Name' },
-    mute: { ca: 'Silenciar', en: 'Mute' },
-    unmute: { ca: 'Activar', en: 'Unmute' },
-    volume: { ca: 'Volum', en: 'Volume' },
-    level: { ca: 'Nivell', en: 'Level' },
-    pointsSuffix: { ca: 'pts', en: 'pts' },
-    pause: { ca: 'Pausa', en: 'Pause' },
-    resume: { ca: 'Reprendre', en: 'Resume' },
-    continueGame: { ca: 'Continuar', en: 'Continue' },
-    newGame: { ca: 'Nova Partida', en: 'New Game' },
-    selectLanguage: { ca: 'Selecciona idioma', en: 'Select language' },
-    confirmClearData: { ca: 'Segur que vols esborrar totes les dades locals (puntuacions, configuració)?', en: 'Are you sure you want to clear all local data (scores, settings)?' },
-    dataClearedSuccess: { ca: 'Dades esborrades correctament', en: 'Data cleared successfully' }
+    clearLocal: { ca: 'Esborrat puntuacions locals', en: 'Local scores cleared', es: 'Puntuaciones locales borradas' },
+    confirmExit: { ca: 'Vols sortir de la partida en curs?', en: 'Leave the current game?', es: '¿Salir de la partida en curso?' },
+    nameLabel: { ca: 'Nom', en: 'Name', es: 'Nombre' },
+    mute: { ca: 'Silenciar', en: 'Mute', es: 'Silenciar' },
+    unmute: { ca: 'Activar', en: 'Unmute', es: 'Activar' },
+    volume: { ca: 'Volum', en: 'Volume', es: 'Volumen' },
+    level: { ca: 'Nivell', en: 'Level', es: 'Nivel' },
+    pointsSuffix: { ca: 'pts', en: 'pts', es: 'pts' },
+    pause: { ca: 'Pausa', en: 'Pause', es: 'Pausa' },
+    resume: { ca: 'Reprendre', en: 'Resume', es: 'Reanudar' },
+    continueGame: { ca: 'Continuar', en: 'Continue', es: 'Continuar' },
+    newGame: { ca: 'Nova Partida', en: 'New Game', es: 'Nueva Partida' },
+    selectLanguage: { ca: 'Selecciona idioma', en: 'Select language', es: 'Selecciona idioma' },
+    confirmClearData: { ca: 'Segur que vols esborrar totes les dades locals (puntuacions, configuració)?', en: 'Are you sure you want to clear all local data (scores, settings)?', es: '¿Estás seguro de que quieres borrar todos los datos locales (puntuaciones, configuración)?' },
+    dataClearedSuccess: { ca: 'Dades esborrades correctament', en: 'Data cleared successfully', es: 'Datos borrados correctamente' }
 };
 
 // Function to select initial language on first visit
@@ -298,9 +301,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('select-lang-en').addEventListener('click', () => {
             selectInitialLanguage('en');
         });
+        document.getElementById('select-lang-es').addEventListener('click', () => {
+            selectInitialLanguage('es');
+        });
     } else {
         // Not first visit - restore language and show menu
-        if (storedLang === 'ca' || storedLang === 'en') {
+        if (storedLang === 'ca' || storedLang === 'en' || storedLang === 'es') {
             currentLanguage = storedLang;
         }
         document.getElementById('language-selection-screen').style.display = 'none';
@@ -310,6 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Settings screen language buttons
     document.getElementById('settings-lang-ca').addEventListener('click', () => updateLanguage('ca'));
     document.getElementById('settings-lang-en').addEventListener('click', () => updateLanguage('en'));
+    document.getElementById('settings-lang-es').addEventListener('click', () => updateLanguage('es'));
 
     // Restaurar estat música
     const storedMusic = localStorage.getItem('dejocoBlocksMusic');
