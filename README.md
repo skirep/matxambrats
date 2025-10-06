@@ -19,7 +19,13 @@ The game is deployed at: [GitHub Pages URL]
 
 ## Firebase Configuration for Multiplayer
 
-To enable the multiplayer mode (Online Deathmatch), you need to configure Firebase Realtime Database security rules. See **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** for complete setup instructions.
+To enable the multiplayer mode (Online Deathmatch), you need to configure Firebase Realtime Database security rules. Choose one of these options:
+
+- **[FIREBASE_QUICK_START.md](FIREBASE_QUICK_START.md)** - Quick manual setup (5 minutes)
+- **[FIREBASE_CLI_DEPLOYMENT.md](FIREBASE_CLI_DEPLOYMENT.md)** - Automatic deployment with Firebase CLI
+- **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** - Complete setup guide with security options
+
+If you encounter errors like "permission_denied at /rooms", see **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)**.
 
 ## Build Mobile Apps
 
@@ -150,15 +156,23 @@ To modify the game:
 ### NPM Scripts
 
 ```bash
+# Build & Development
 npm run build                    # Build web app
 npm run cap:add:android         # Add Android platform
 npm run cap:add:ios             # Add iOS platform
 npm run cap:sync                # Sync with all platforms
 npm run cap:open:android        # Open in Android Studio
 npm run cap:open:ios            # Open in Xcode
+
+# Mobile Builds
 npm run android:build           # Build debug APK
 npm run android:build:release   # Build release APK
 npm run ios:build               # Prepare for iOS build
+
+# Firebase Deployment
+npm run firebase:login          # Login to Firebase
+npm run firebase:deploy:database # Deploy database rules only
+npm run firebase:deploy         # Deploy everything (database + hosting)
 ```
 
 ## License

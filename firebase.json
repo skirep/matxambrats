@@ -1,0 +1,21 @@
+{
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "package.json",
+      "package-lock.json",
+      "capacitor.config.json",
+      "android/**",
+      "ios/**",
+      "www/**",
+      ".github/**",
+      "*.md"
+    ]
+  }
+}

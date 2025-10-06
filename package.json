@@ -14,7 +14,10 @@
     "cap:open:ios": "cap open ios",
     "android:build": "npm run build && npm run cap:sync && cd android && ./gradlew assembleDebug",
     "android:build:release": "npm run build && npm run cap:sync && cd android && ./gradlew assembleRelease",
-    "ios:build": "npm run build && npm run cap:sync"
+    "ios:build": "npm run build && npm run cap:sync",
+    "firebase:deploy": "firebase deploy",
+    "firebase:deploy:database": "firebase deploy --only database",
+    "firebase:login": "firebase login"
   },
   "keywords": [
     "tetris",
@@ -27,7 +30,8 @@
   "author": "Dejoco Arts",
   "license": "ISC",
   "devDependencies": {
-    "@capacitor/cli": "^5.5.1"
+    "@capacitor/cli": "^5.5.1",
+    "firebase-tools": "^13.0.0"
   },
   "dependencies": {
     "@capacitor/android": "^5.5.1",

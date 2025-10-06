@@ -4,7 +4,15 @@
 
 El mode multijugador (Deathmatch Online) utilitza Firebase Realtime Database per sincronitzar les partides entre jugadors. Per a que funcioni correctament, necessites configurar les regles de seguretat de la base de dades.
 
-## Configuració Pas a Pas
+## Opcions de Configuració
+
+Tens dues opcions per configurar les regles de Firebase:
+
+1. **Configuració Manual** (explicada a continuació) - Còpia manual de regles a la consola
+2. **Desplegament Automàtic** - Utilitza Firebase CLI per desplegar automàticament
+   - Consulta **[FIREBASE_CLI_DEPLOYMENT.md](FIREBASE_CLI_DEPLOYMENT.md)** per instruccions
+
+## Configuració Pas a Pas (Manual)
 
 ### 1. Accedeix a la Consola de Firebase
 
@@ -161,9 +169,13 @@ Per verificar que tot funciona:
 
 ## Solució de Problemes
 
-### Error: "Permission denied"
+### Error: "permission_denied at /rooms"
 
-- Verifica que has publicat les regles de seguretat a la consola de Firebase
+Aquest és l'error més comú i apareix quan les regles de seguretat no estan configurades o no s'han publicat.
+
+**Solució**:
+- Verifica que has publicat les regles de seguretat a la consola de Firebase (botó "Publish")
+- Si acabes de configurar-les, espera uns segons i refresca l'aplicació
 - Comprova que el `databaseURL` en `script.js` coincideix amb la regió de la teva base de dades:
   - Si la base de dades està a **US**: `https://dejoco-blocks-default-rtdb.firebaseio.com`
   - Si la base de dades està a **Europa (europe-west1)**: `https://dejoco-blocks-default-rtdb.europe-west1.firebasedatabase.app/`
