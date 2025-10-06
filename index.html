@@ -8,6 +8,7 @@
     <script src="script.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
     <!-- Initial Language Selection Screen -->
@@ -30,6 +31,7 @@
         <h1>Matxambrats</h1>
         <p class="tagline">v0.5</p>
         <button id="new-game" data-ca="Nova Partida" data-en="New Game" data-es="Nueva Partida">Nova Partida</button>
+        <button id="online-deathmatch" data-ca="Deathmatch Online" data-en="Online Deathmatch" data-es="Deathmatch Online">Deathmatch Online</button>
         <button id="how-to-play" data-ca="Com Jugar" data-en="How to Play" data-es="Cómo Jugar">Com Jugar</button>
         <button id="highscores" data-ca="Puntuacions" data-en="Highscores" data-es="Puntuaciones">Puntuacions</button>
         <button id="settings" data-ca="Opcions" data-en="Settings" data-es="Opciones">Opcions</button>
@@ -118,6 +120,17 @@
         <div class="highscores-actions">
             <button id="refresh-highscores" data-ca="Refrescar" data-en="Refresh" data-es="Refrescar">Refrescar</button>
             <button id="back-to-menu" data-ca="Tornar al Menú" data-en="Back to Menu" data-es="Volver al Menú">Tornar al Menú</button>
+        </div>
+    </div>
+    <div id="multiplayer-lobby" style="display: none;">
+        <h1 data-ca="Deathmatch Online" data-en="Online Deathmatch" data-es="Deathmatch Online">Deathmatch Online</h1>
+        <div class="lobby-content">
+            <div id="lobby-status" data-ca="Esperant oponent..." data-en="Waiting for opponent..." data-es="Esperando oponente...">Esperant oponent...</div>
+            <p id="room-code-display"></p>
+            <p id="opponent-name-display"></p>
+        </div>
+        <div class="lobby-actions">
+            <button id="cancel-multiplayer" data-ca="Cancel·lar" data-en="Cancel" data-es="Cancelar">Cancel·lar</button>
         </div>
     </div>
     <div id="instructions-screen" style="display: none;">
