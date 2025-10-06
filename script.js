@@ -684,12 +684,17 @@ function checkRows() {
                     board.unshift(row);
                 });
 
-                score += clearedCount * 10;
+                // Calculate score based on lines cleared
+                const previousScore = score;
+                const scoreMap = { 1: 100, 2: 300, 3: 500, 4: 800 };
+                score += scoreMap[clearedCount] || 0;
                 scoreElement.textContent = score;
 
                 linesCleared += clearedCount;
                 updateLevel();
-                if (Math.floor(linesCleared / 10) > Math.floor(previousLinesCleared / 10)) {
+                
+                // Speed increases every 1000 points
+                if (Math.floor(score / 1000) > Math.floor(previousScore / 1000)) {
                     gameSpeed = Math.max(100, gameSpeed - 50);
                     dropInterval = gameSpeed;
                 }
