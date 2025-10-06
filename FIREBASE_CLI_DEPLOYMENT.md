@@ -20,6 +20,12 @@ npm install -g firebase-tools
 
 ### 1. Autenticació amb Firebase
 
+**Opció A: Utilitzant npm scripts (recomanat)**
+```bash
+npm run firebase:login
+```
+
+**Opció B: Utilitzant Firebase CLI directament**
 ```bash
 firebase login
 ```
@@ -43,8 +49,14 @@ Hauria de mostrar el projecte **dejoco-blocks**.
 
 ### 3. Desplegar les Regles de la Base de Dades
 
-Des del directori arrel del projecte, executa:
+Des del directori arrel del projecte, executa una d'aquestes opcions:
 
+**Opció A: Utilitzant npm scripts (recomanat)**
+```bash
+npm run firebase:deploy:database
+```
+
+**Opció B: Utilitzant Firebase CLI directament**
 ```bash
 firebase deploy --only database
 ```
@@ -55,6 +67,12 @@ Això desplegarà automàticament les regles de `database.rules.json` al teu pro
 
 Si vols desplegar tant les regles com l'aplicació web a Firebase Hosting:
 
+**Opció A: Utilitzant npm scripts**
+```bash
+npm run firebase:deploy
+```
+
+**Opció B: Utilitzant Firebase CLI directament**
 ```bash
 firebase deploy
 ```

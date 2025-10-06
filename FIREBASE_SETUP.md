@@ -169,9 +169,13 @@ Per verificar que tot funciona:
 
 ## Solució de Problemes
 
-### Error: "Permission denied"
+### Error: "permission_denied at /rooms"
 
-- Verifica que has publicat les regles de seguretat a la consola de Firebase
+Aquest és l'error més comú i apareix quan les regles de seguretat no estan configurades o no s'han publicat.
+
+**Solució**:
+- Verifica que has publicat les regles de seguretat a la consola de Firebase (botó "Publish")
+- Si acabes de configurar-les, espera uns segons i refresca l'aplicació
 - Comprova que el `databaseURL` en `script.js` coincideix amb la regió de la teva base de dades:
   - Si la base de dades està a **US**: `https://dejoco-blocks-default-rtdb.firebaseio.com`
   - Si la base de dades està a **Europa (europe-west1)**: `https://dejoco-blocks-default-rtdb.europe-west1.firebasedatabase.app/`

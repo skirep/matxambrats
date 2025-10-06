@@ -2,7 +2,12 @@
 
 ## Problema
 
-El mode **Deathmatch Online** no funciona perquè falten les regles de seguretat de Firebase Realtime Database.
+El mode **Deathmatch Online** no funciona i mostra l'error:
+```
+permission_denied at /rooms: Client doesn't have permission to access the desired data.
+```
+
+Això passa perquè falten les regles de seguretat de Firebase Realtime Database.
 
 ## Solució Ràpida (5 minuts)
 
