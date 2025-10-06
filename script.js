@@ -1,9 +1,14 @@
 document.getElementById('new-game').addEventListener('click', handleNewGameClick);
+document.getElementById('online-deathmatch').addEventListener('click', joinMultiplayerGame);
 document.getElementById('how-to-play').addEventListener('click', showInstructions);
 document.getElementById('highscores').addEventListener('click', showHighscores);
 document.getElementById('credits').addEventListener('click', showCredits);
 document.getElementById('back-to-menu').addEventListener('click', () => {
     // Use history.back() to trigger popstate for proper navigation
+    history.back();
+});
+document.getElementById('cancel-multiplayer').addEventListener('click', () => {
+    cleanupMultiplayer();
     history.back();
 });
 document.getElementById('back-to-menu-game').addEventListener('click', () => {
@@ -212,7 +217,12 @@ const translations = {
     newGame: { ca: 'Nova Partida', en: 'New Game', es: 'Nueva Partida' },
     selectLanguage: { ca: 'Selecciona idioma', en: 'Select language', es: 'Selecciona idioma' },
     confirmClearData: { ca: 'Segur que vols esborrar totes les dades locals (puntuacions, configuració)?', en: 'Are you sure you want to clear all local data (scores, settings)?', es: '¿Estás seguro de que quieres borrar todos los datos locales (puntuaciones, configuración)?' },
-    dataClearedSuccess: { ca: 'Dades esborrades correctament', en: 'Data cleared successfully', es: 'Datos borrados correctamente' }
+    dataClearedSuccess: { ca: 'Dades esborrades correctament', en: 'Data cleared successfully', es: 'Datos borrados correctamente' },
+    multiplayerNotAvailable: { ca: 'Multijugador no disponible. Comprova la configuració de Firebase.', en: 'Multiplayer not available. Check Firebase configuration.', es: 'Multijugador no disponible. Verifica la configuración de Firebase.' },
+    roomCode: { ca: 'Codi de sala', en: 'Room Code', es: 'Código de sala' },
+    opponent: { ca: 'Oponent', en: 'Opponent', es: 'Oponente' },
+    waitingForOpponent: { ca: 'Esperant oponent...', en: 'Waiting for opponent...', es: 'Esperando oponente...' },
+    opponentClearedLines: { ca: 'L\'oponent ha fet una línia!', en: 'Opponent cleared a line!', es: '¡El oponente hizo una línea!' }
 };
 
 // Function to select initial language on first visit
@@ -388,6 +398,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Check if we're on the game screen
         if (document.getElementById('game-container').style.display !== 'none') {
             returnToMenu();
+        }
+        // Check if we're on the multiplayer lobby screen
+        else if (document.getElementById('multiplayer-lobby').style.display !== 'none') {
+            cleanupMultiplayer();
+            document.getElementById('multiplayer-lobby').style.display = 'none';
+            document.getElementById('menu').style.display = 'flex';
+            updateNewGameButton();
         }
         // Check if we're on the highscores screen
         else if (document.getElementById('highscores-screen').style.display !== 'none') {
@@ -698,6 +715,11 @@ function checkRows() {
                     dropInterval = gameSpeed;
                 }
                 
+                // Send line clear to opponent in multiplayer mode
+                if (isMultiplayerMode && clearedCount > 0) {
+                    sendLineClearToOpponent(clearedCount);
+                }
+                
                 isAnimating = false;
                 createPiece();
             });
@@ -722,6 +744,11 @@ function gameOver() {
     document.getElementById('game-container').style.display = 'none';
     document.getElementById('menu').style.display = 'flex';
     updateNewGameButton();
+    
+    // Cleanup multiplayer if active
+    if (isMultiplayerMode) {
+        cleanupMultiplayer();
+    }
 }
 
 function updateTimer() {
@@ -765,6 +792,11 @@ function returnToMenu() {
     // Hide game and show menu
     document.getElementById('game-container').style.display = 'none';
     document.getElementById('menu').style.display = 'flex';
+    
+    // Cleanup multiplayer if active
+    if (isMultiplayerMode) {
+        cleanupMultiplayer();
+    }
     
     // Update the button text to show "Continue"
     updateNewGameButton();
@@ -837,7 +869,16 @@ function startGame() {
 // --- Firebase Highscores (Public Leaderboard) ---
 let firebaseApp = null;
 let firestore = null;
+let database = null;
 let firestoreEnabled = false; // Canvi a true automàtic després de config vàlida
+
+// Multiplayer variables
+let isMultiplayerMode = false;
+let currentRoom = null;
+let currentRoomRef = null;
+let playerRole = null; // 'player1' or 'player2'
+let opponentName = '';
+let roomListener = null;
 
 function initFirebase() {
     if (firebaseApp) return;
@@ -851,11 +892,13 @@ function initFirebase() {
         apiKey: "AIzaSyAKe5KSEh71w1ik2ynRYBEyd9jWOY-Dl5U",
         authDomain: "dejoco-blocks.firebaseapp.com",
         projectId: "dejoco-blocks",
+        databaseURL: "https://dejoco-blocks-default-rtdb.firebaseio.com"
     };
     // Validació mínima perquè l'usuari ompli
     if (!firebaseConfig.apiKey.startsWith('REEMPLENA')) {
         firebaseApp = firebase.initializeApp(firebaseConfig);
         firestore = firebase.firestore();
+        database = firebase.database();
         firestoreEnabled = true;
     } else {
         console.warn('Firebase no configurat. S\'utilitzarà només el mode local.');
@@ -892,6 +935,243 @@ async function fetchRemoteHighscores(limit = 10) {
         return null;
     }
 }
+
+// --- Multiplayer Functions ---
+function generateRoomCode() {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+async function startMultiplayerGame() {
+    initFirebase();
+    if (!firestoreEnabled || !database) {
+        alert(translations.multiplayerNotAvailable[currentLanguage]);
+        return;
+    }
+    
+    // Show lobby screen
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('multiplayer-lobby').style.display = 'flex';
+    history.pushState({ screen: 'multiplayer-lobby' }, '', '');
+    
+    isMultiplayerMode = true;
+    const playerName = sanitizePlayerName(getPlayerName());
+    const roomCode = generateRoomCode();
+    currentRoom = roomCode;
+    
+    // Display room code
+    document.getElementById('room-code-display').textContent = 
+        (translations.roomCode[currentLanguage] || 'Room Code') + ': ' + roomCode;
+    
+    // Create room in Firebase
+    currentRoomRef = database.ref('rooms/' + roomCode);
+    playerRole = 'player1';
+    
+    await currentRoomRef.set({
+        player1: {
+            name: playerName,
+            ready: true,
+            linesCleared: 0
+        },
+        player2: null,
+        status: 'waiting',
+        createdAt: Date.now()
+    });
+    
+    // Listen for player 2 joining
+    roomListener = currentRoomRef.on('value', (snapshot) => {
+        const roomData = snapshot.val();
+        if (!roomData) return;
+        
+        if (roomData.player2 && roomData.status === 'waiting') {
+            // Player 2 joined
+            opponentName = roomData.player2.name;
+            document.getElementById('opponent-name-display').textContent = 
+                (translations.opponent[currentLanguage] || 'Opponent') + ': ' + opponentName;
+            
+            // Start game
+            setTimeout(() => {
+                currentRoomRef.update({ status: 'playing' });
+                startMultiplayerGameSession();
+            }, 1000);
+        } else if (roomData.status === 'playing') {
+            startMultiplayerGameSession();
+        }
+        
+        // Listen for opponent line clears
+        if (playerRole === 'player1' && roomData.player2 && roomData.player2.linesCleared > 0) {
+            handleOpponentLineCleared(roomData.player2.linesCleared);
+        } else if (playerRole === 'player2' && roomData.player1 && roomData.player1.linesCleared > 0) {
+            handleOpponentLineCleared(roomData.player1.linesCleared);
+        }
+    });
+}
+
+async function joinMultiplayerGame() {
+    // For now, auto-join first available room
+    initFirebase();
+    if (!firestoreEnabled || !database) {
+        alert(translations.multiplayerNotAvailable[currentLanguage]);
+        return;
+    }
+    
+    // Show lobby screen
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('multiplayer-lobby').style.display = 'flex';
+    history.pushState({ screen: 'multiplayer-lobby' }, '', '');
+    
+    isMultiplayerMode = true;
+    const playerName = sanitizePlayerName(getPlayerName());
+    
+    // Find available room
+    const roomsRef = database.ref('rooms');
+    const snapshot = await roomsRef.orderByChild('status').equalTo('waiting').limitToFirst(1).once('value');
+    
+    if (snapshot.exists()) {
+        const rooms = snapshot.val();
+        const roomCode = Object.keys(rooms)[0];
+        currentRoom = roomCode;
+        currentRoomRef = database.ref('rooms/' + roomCode);
+        playerRole = 'player2';
+        
+        document.getElementById('room-code-display').textContent = 
+            (translations.roomCode[currentLanguage] || 'Room Code') + ': ' + roomCode;
+        
+        // Join room
+        await currentRoomRef.child('player2').set({
+            name: playerName,
+            ready: true,
+            linesCleared: 0
+        });
+        
+        await currentRoomRef.update({ status: 'playing' });
+        
+        // Get opponent name
+        const roomData = (await currentRoomRef.once('value')).val();
+        opponentName = roomData.player1.name;
+        document.getElementById('opponent-name-display').textContent = 
+            (translations.opponent[currentLanguage] || 'Opponent') + ': ' + opponentName;
+        
+        // Listen for game updates
+        roomListener = currentRoomRef.on('value', (snapshot) => {
+            const roomData = snapshot.val();
+            if (!roomData) return;
+            
+            // Listen for opponent line clears
+            if (playerRole === 'player2' && roomData.player1 && roomData.player1.linesCleared > 0) {
+                handleOpponentLineCleared(roomData.player1.linesCleared);
+            }
+        });
+        
+        setTimeout(() => {
+            startMultiplayerGameSession();
+        }, 1000);
+    } else {
+        // No rooms available, create one
+        startMultiplayerGame();
+    }
+}
+
+function startMultiplayerGameSession() {
+    document.getElementById('multiplayer-lobby').style.display = 'none';
+    document.getElementById('game-container').style.display = 'flex';
+    
+    // Show opponent info in game
+    const opponentInfo = document.getElementById('opponent-info');
+    const opponentGameName = document.getElementById('opponent-game-name');
+    if (opponentInfo && opponentGameName) {
+        opponentInfo.style.display = 'block';
+        opponentGameName.textContent = opponentName;
+    }
+    
+    startGame();
+}
+
+let lastOpponentLines = 0;
+
+function handleOpponentLineCleared(opponentLines) {
+    // Visual feedback when opponent clears lines
+    if (opponentLines > lastOpponentLines) {
+        const linesClearedNow = opponentLines - lastOpponentLines;
+        lastOpponentLines = opponentLines;
+        
+        // Update opponent lines display
+        const opponentLinesElement = document.getElementById('opponent-lines');
+        if (opponentLinesElement) {
+            const linesText = currentLanguage === 'ca' ? 'línies' : 
+                             currentLanguage === 'es' ? 'líneas' : 'lines';
+            opponentLinesElement.innerHTML = opponentLines + ' <span>' + linesText + '</span>';
+        }
+        
+        // Show notification
+        showOpponentNotification(linesClearedNow);
+    }
+}
+
+function showOpponentNotification(lineCount) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.style.position = 'fixed';
+    notification.style.top = '50%';
+    notification.style.left = '50%';
+    notification.style.transform = 'translate(-50%, -50%)';
+    notification.style.backgroundColor = 'rgba(48, 98, 48, 0.95)';
+    notification.style.color = '#9bbc0f';
+    notification.style.padding = '20px 40px';
+    notification.style.borderRadius = '10px';
+    notification.style.fontSize = '24px';
+    notification.style.fontWeight = 'bold';
+    notification.style.zIndex = '10000';
+    notification.style.border = '3px solid #0f380f';
+    notification.style.textAlign = 'center';
+    notification.textContent = translations.opponentClearedLines[currentLanguage] + ' (' + lineCount + ')';
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 2 seconds
+    setTimeout(() => {
+        notification.style.transition = 'opacity 0.5s';
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 500);
+    }, 2000);
+}
+
+async function sendLineClearToOpponent(lineCount) {
+    if (!isMultiplayerMode || !currentRoomRef || !playerRole) return;
+    
+    try {
+        const updates = {};
+        updates[`${playerRole}/linesCleared`] = firebase.database.ServerValue.increment(lineCount);
+        await currentRoomRef.update(updates);
+    } catch (e) {
+        console.warn('Error sending line clear:', e);
+    }
+}
+
+function cleanupMultiplayer() {
+    if (roomListener && currentRoomRef) {
+        currentRoomRef.off('value', roomListener);
+        roomListener = null;
+    }
+    if (currentRoomRef && playerRole) {
+        currentRoomRef.child(playerRole).remove().catch(() => {});
+    }
+    
+    // Hide opponent info
+    const opponentInfo = document.getElementById('opponent-info');
+    if (opponentInfo) {
+        opponentInfo.style.display = 'none';
+    }
+    
+    isMultiplayerMode = false;
+    currentRoom = null;
+    currentRoomRef = null;
+    playerRole = null;
+    opponentName = '';
+    lastOpponentLines = 0;
+}
+
 // --- Fi Firebase ---
 
 // Guardar nom jugador a localStorage - now handling multiple inputs
