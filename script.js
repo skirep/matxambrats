@@ -1074,13 +1074,67 @@ async function joinMultiplayerGame() {
 function startMultiplayerGameSession() {
     document.getElementById('multiplayer-lobby').style.display = 'none';
     document.getElementById('game-container').style.display = 'flex';
+    
+    // Show opponent info in game
+    const opponentInfo = document.getElementById('opponent-info');
+    const opponentGameName = document.getElementById('opponent-game-name');
+    if (opponentInfo && opponentGameName) {
+        opponentInfo.style.display = 'block';
+        opponentGameName.textContent = opponentName;
+    }
+    
     startGame();
 }
 
+let lastOpponentLines = 0;
+
 function handleOpponentLineCleared(opponentLines) {
     // Visual feedback when opponent clears lines
-    // This could show a notification or send garbage lines
-    console.log('Opponent cleared lines:', opponentLines);
+    if (opponentLines > lastOpponentLines) {
+        const linesClearedNow = opponentLines - lastOpponentLines;
+        lastOpponentLines = opponentLines;
+        
+        // Update opponent lines display
+        const opponentLinesElement = document.getElementById('opponent-lines');
+        if (opponentLinesElement) {
+            const linesText = currentLanguage === 'ca' ? 'línies' : 
+                             currentLanguage === 'es' ? 'líneas' : 'lines';
+            opponentLinesElement.innerHTML = opponentLines + ' <span>' + linesText + '</span>';
+        }
+        
+        // Show notification
+        showOpponentNotification(linesClearedNow);
+    }
+}
+
+function showOpponentNotification(lineCount) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.style.position = 'fixed';
+    notification.style.top = '50%';
+    notification.style.left = '50%';
+    notification.style.transform = 'translate(-50%, -50%)';
+    notification.style.backgroundColor = 'rgba(48, 98, 48, 0.95)';
+    notification.style.color = '#9bbc0f';
+    notification.style.padding = '20px 40px';
+    notification.style.borderRadius = '10px';
+    notification.style.fontSize = '24px';
+    notification.style.fontWeight = 'bold';
+    notification.style.zIndex = '10000';
+    notification.style.border = '3px solid #0f380f';
+    notification.style.textAlign = 'center';
+    notification.textContent = translations.opponentClearedLines[currentLanguage] + ' (' + lineCount + ')';
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 2 seconds
+    setTimeout(() => {
+        notification.style.transition = 'opacity 0.5s';
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 500);
+    }, 2000);
 }
 
 async function sendLineClearToOpponent(lineCount) {
@@ -1103,11 +1157,19 @@ function cleanupMultiplayer() {
     if (currentRoomRef && playerRole) {
         currentRoomRef.child(playerRole).remove().catch(() => {});
     }
+    
+    // Hide opponent info
+    const opponentInfo = document.getElementById('opponent-info');
+    if (opponentInfo) {
+        opponentInfo.style.display = 'none';
+    }
+    
     isMultiplayerMode = false;
     currentRoom = null;
     currentRoomRef = null;
     playerRole = null;
     opponentName = '';
+    lastOpponentLines = 0;
 }
 
 // --- Fi Firebase ---
