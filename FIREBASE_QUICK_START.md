@@ -26,11 +26,9 @@ A la pestanya **Rules**, enganxa aquest codi:
 {
   "rules": {
     "rooms": {
-      "$roomCode": {
-        ".read": true,
-        ".write": true,
-        ".indexOn": ["status", "createdAt"]
-      }
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["status", "createdAt"]
     }
   }
 }
