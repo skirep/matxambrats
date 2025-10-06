@@ -892,7 +892,7 @@ function initFirebase() {
         apiKey: "AIzaSyAKe5KSEh71w1ik2ynRYBEyd9jWOY-Dl5U",
         authDomain: "dejoco-blocks.firebaseapp.com",
         projectId: "dejoco-blocks",
-        databaseURL: "https://dejoco-blocks-default-rtdb.firebaseio.com"
+        databaseURL: "https://dejoco-blocks-default-rtdb.europe-west1.firebasedatabase.app/"
     };
     // Validació mínima perquè l'usuari ompli
     if (!firebaseConfig.apiKey.startsWith('REEMPLENA')) {
