@@ -90,11 +90,9 @@ Després del desplegament, pots verificar que les regles s'han aplicat correctam
 {
   "rules": {
     "rooms": {
-      "$roomCode": {
-        ".read": true,
-        ".write": true,
-        ".indexOn": ["status", "createdAt"]
-      }
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["status", "createdAt"]
     }
   }
 }

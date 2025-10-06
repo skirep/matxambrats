@@ -35,11 +35,9 @@ Tens dues opcions per configurar les regles de Firebase:
 {
   "rules": {
     "rooms": {
-      "$roomCode": {
-        ".read": true,
-        ".write": true,
-        ".indexOn": ["status", "createdAt"]
-      }
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["status", "createdAt"]
     }
   }
 }
@@ -70,7 +68,7 @@ Pots trobar l'URL exacta a la consola de Firebase, a la pàgina de Realtime Data
 
 Les regles configurades permeten:
 
-- **Lectura i escriptura** a totes les sales (`rooms/$roomCode`)
+- **Lectura i escriptura** a totes les sales dins del node `rooms`
 - **Indexació** pels camps `status` i `createdAt` per optimitzar les consultes
 
 ### Per què aquestes regles?
@@ -94,10 +92,9 @@ Activa l'autenticació anònima a Firebase i modifica les regles:
 {
   "rules": {
     "rooms": {
-      "$roomCode": {
-        ".read": "auth != null",
-        ".write": "auth != null"
-      }
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": ["status", "createdAt"]
     }
   }
 }
@@ -111,24 +108,15 @@ Afegeix validació per assegurar l'estructura de les dades:
 {
   "rules": {
     "rooms": {
-      "$roomCode": {
-        ".read": true,
-        ".write": true,
-        ".validate": "newData.hasChildren(['status', 'createdAt'])",
-        "player1": {
-          ".validate": "newData.hasChildren(['name', 'ready', 'linesCleared'])"
-        },
-        "player2": {
-          ".validate": "newData.hasChildren(['name', 'ready', 'linesCleared'])"
-        },
-        "status": {
-          ".validate": "newData.isString() && (newData.val() == 'waiting' || newData.val() == 'playing' || newData.val() == 'finished')"
-        }
-      }
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["status", "createdAt"]
     }
   }
 }
 ```
+
+**Nota**: Les regles avançades amb validació de l'estructura de dades (`$roomCode`, validació de camps) poden causar problemes de permisos. Per a un funcionament fiable, utilitza les regles bàsiques mostrades anteriorment.
 
 ### 3. Neteja Automàtica de Sales Antigues
 
