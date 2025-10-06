@@ -1305,6 +1305,17 @@ async function loadHighscores(limit=50) {
     highscoresList.innerHTML = '<li>Loading...</li>';
     let remote = await fetchRemoteHighscores(limit);
     if (remote && remote.length > 0) {
+        // Sort by score descending, then by time ascending (for ties)
+        remote.sort((a, b) => {
+            if (b.score !== a.score) {
+                return b.score - a.score;
+            }
+            // For same score, sort by time (ascending, lower time is better)
+            // Entries without time are treated as having the best time (0)
+            if (a.time === null || a.time === undefined) return -1;
+            if (b.time === null || b.time === undefined) return 1;
+            return a.time - b.time;
+        });
         renderHighscoreList(remote.map(r=>({name:r.name, score:r.score, time:r.time, ts:r.ts})), true);
     } else {
         let local = JSON.parse(localStorage.getItem('tetrisHighscores')) || [];
