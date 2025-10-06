@@ -1207,6 +1207,7 @@ function cleanupMultiplayer() {
     playerRole = null;
     opponentName = '';
     lastOpponentLines = 0;
+    pendingGarbageLines = 0;
 }
 
 // --- Fi Firebase ---
