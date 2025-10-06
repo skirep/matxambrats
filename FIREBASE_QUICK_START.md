@@ -1,0 +1,56 @@
+# Guia Ràpida: Configuració de Firebase per Multijugador
+
+## Problema
+
+El mode **Deathmatch Online** no funciona perquè falten les regles de seguretat de Firebase Realtime Database.
+
+## Solució Ràpida (5 minuts)
+
+### 1. Ves a Firebase Console
+
+Accedeix a: https://console.firebase.google.com/project/dejoco-blocks/database/dejoco-blocks-default-rtdb/rules
+
+### 2. Configura les Regles
+
+A la pestanya **Rules**, enganxa aquest codi:
+
+```json
+{
+  "rules": {
+    "rooms": {
+      "$roomCode": {
+        ".read": true,
+        ".write": true,
+        ".indexOn": ["status", "createdAt"]
+      }
+    }
+  }
+}
+```
+
+### 3. Publica les Regles
+
+Fes clic al botó **Publish** (Publicar)
+
+### 4. Prova el Multijugador
+
+1. Obre l'aplicació en dos dispositius o navegadors
+2. Fes clic a **Deathmatch Online** en tots dos
+3. Els jugadors haurien de connectar-se automàticament
+
+## Què fan aquestes regles?
+
+- Permeten que qualsevol jugador pugui crear i unir-se a sales
+- Indexen les sales per estat (`waiting`, `playing`) per trobar-les ràpidament
+- Permeten la sincronització en temps real entre jugadors
+
+## Documentació Completa
+
+Per més detalls i opcions de seguretat avançades, consulta **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)**
+
+## Ajuda
+
+Si tens problemes:
+- Verifica que la URL de la base de dades és: `https://dejoco-blocks-default-rtdb.firebaseio.com`
+- Comprova la consola del navegador per errors
+- Assegura't que has publicat les regles (botó **Publish**)
