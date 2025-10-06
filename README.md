@@ -8,6 +8,7 @@ A modern Tetris game built with HTML5, CSS3, and JavaScript. This game supports:
 - In-game instructions screen with visual guides
 - Mobile and desktop controls
 - High scores with Firebase integration
+- **Multiplayer mode (Online Deathmatch)**
 - Background music
 - Progressive difficulty levels
 - Game Boy-inspired retro design
@@ -15,6 +16,10 @@ A modern Tetris game built with HTML5, CSS3, and JavaScript. This game supports:
 ## Play Online
 
 The game is deployed at: [GitHub Pages URL]
+
+## Firebase Configuration for Multiplayer
+
+To enable the multiplayer mode (Online Deathmatch), you need to configure Firebase Realtime Database security rules. See **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** for complete setup instructions.
 
 ## Build Mobile Apps
 
